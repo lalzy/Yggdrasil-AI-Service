@@ -1,4 +1,4 @@
-namespace Yggdrasil.Models;
+namespace Yggdrasil.DTO;
 
 public class ChatMessage
 {

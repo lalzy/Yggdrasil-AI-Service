@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Yggdrasil.Models;
 using Yggdrasil.Services;
+using Yggdrasil.DTO;
 
 namespace Tests.Endpoints;
 

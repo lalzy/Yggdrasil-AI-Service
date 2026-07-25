@@ -23,4 +23,9 @@ public class LLMService
                      .GetProperty("content")
                      .GetString() ?? "";
     }
+
+    public string GenerateBasePrompt(Guid World_ID)
+    {
+        return "";
+    }
 }

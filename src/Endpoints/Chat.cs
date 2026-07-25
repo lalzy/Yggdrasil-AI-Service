@@ -1,6 +1,5 @@
-using System.Data.Common;
 using Yggdrasil.Services;
-using Yggdrasil.Models;
+using Yggdrasil.DTO;
 
 namespace Yggdrasil.Endpoints;
 
