@@ -18,11 +18,11 @@ public class ChatService{
     public ChatLogs CreateMessage (ChatMessage request)
     {
         var conv_ID = request.Conversation_ID ?? Guid.NewGuid();
-        var isNew = !_db.Set<ChatLogs>().Any(c => c.Conversation_ID == conv_ID);
+        var isNew = !_db.Set<ChatLogs>().Any(c => c.ID == conv_ID);
 
         var log = new ChatLogs()
         {
-            Conversation_ID = conv_ID,
+            ID = conv_ID,
             Role = RoleType.user,
             Content = request.Content,
             Title = isNew ? $"Conversation: {conv_ID.ToString().Substring(0,30)}" : null,
@@ -43,7 +43,7 @@ public class ChatService{
     /// <returns></returns>
     public List<ConversationSummary> GetConversations()
     {
-        return _db.Set<ChatLogs>().Where(c => c.Title != null).Select(c=>new ConversationSummary(c.Conversation_ID, c.Title)).Distinct().ToList();
+        return _db.Set<ChatLogs>().Where(c => c.Title != null).Select(c=>new ConversationSummary(c.ID, c.Title)).Distinct().ToList();
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class ChatService{
     /// <returns>A list of all the requested messages from newest to oldest</returns>
     public List<ChatLogs> GetMessages(Guid id, int? count)
     {
-        var query = _db.Set<ChatLogs>().Where(c=>c.Conversation_ID == id).OrderByDescending(c => c.TimeStamp);
+        var query = _db.Set<ChatLogs>().Where(c=>c.ID == id).OrderByDescending(c => c.TimeStamp);
         return (count.HasValue ? query.Take(count.Value) : query).OrderBy(c => c.TimeStamp).ToList();
     }
 }

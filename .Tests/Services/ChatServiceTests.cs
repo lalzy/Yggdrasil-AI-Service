@@ -58,8 +58,8 @@ public class ChatServiceTests : IDisposable
     {
         var request = new ChatMessage {Content = "Hello"};
         var result = _service.CreateMessage(request);
-        Assert.IsType<Guid>(result.Conversation_ID);
-        Assert.NotEqual(Guid.Empty, result.Conversation_ID);
+        Assert.IsType<Guid>(result.ID);
+        Assert.NotEqual(Guid.Empty, result.ID);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class ChatServiceTests : IDisposable
         var result = _service.CreateMessage(request);
 
         Assert.NotNull(result.Title);
-        Assert.Equal(result.Title, $"Conversation: {result.Conversation_ID.ToString().Substring(0,30)}");
+        Assert.Equal(result.Title, $"Conversation: {result.ID.ToString().Substring(0,30)}");
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class ChatServiceTests : IDisposable
 
         var second = _service.CreateMessage(new ChatMessage
         {
-            Conversation_ID = first.Conversation_ID,
+            Conversation_ID = first.ID,
             Content = "second"
         });
 
@@ -115,7 +115,7 @@ public class ChatServiceTests : IDisposable
         var results = generateChatLogs(generateMessages(conversationsCount));
         ChatLogs toGet = results[_faker.Random.Int(0, conversationsCount - 1)];
 
-        List<ChatLogs> result = _service.GetMessages(toGet.Conversation_ID, null);
+        List<ChatLogs> result = _service.GetMessages(toGet.ID, null);
         Assert.Equal(toGet, result[0]);
     }
 

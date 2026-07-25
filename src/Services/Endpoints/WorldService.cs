@@ -21,11 +21,11 @@ public class WorldService
         return new ServiceResult<World>(world);
     }
 
-    public record WorldSummary(Guid world_ID, string Name);
+    public record WorldSummary(Guid world_ID, string Name, string DEscription);
     
     public List<WorldSummary> getWorlds(int? count)
     {
-        return _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name)).Distinct().ToList();
+        return _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description)).Distinct().ToList();
     }
 
     public ServiceResult<World> createWorld(string name,  string? description=null, string? narratorInstructions=null)

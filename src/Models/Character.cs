@@ -4,6 +4,8 @@ public class Character
 {
     public Guid ID {get; set;}
     public String? Name {get; set;}
+    public String? Occupation {get; set;}
+    public String? NarrativeRole {get; set;}
     public String? Appearance {get; set;}
     public String? Personality {get; set;}
     public String? Gender {get; set;}

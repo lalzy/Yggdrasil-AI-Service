@@ -17,7 +17,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddServices();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=app.db"));
+    options.UseSqlite("Data Source=app.db",
+    x=>x.MigrationsAssembly("Yggdrasil")));
 
 builder.Services.AddRazorPages().AddRazorPagesOptions(options => {
     options.RootDirectory = "/src/Pages";
