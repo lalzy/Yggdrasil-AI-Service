@@ -1,6 +1,6 @@
 # Requirements:
-- .net 10 SDK
-- EF Core Tools: dotnet tool install --global dotnet-ef
+- [.net 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-10.0.302-windows-x64-installer)
+- EF Core Tools: ```dotnet tool install --global dotnet-ef```
 - LLM service (OpenAI-compatible API)
 
 
