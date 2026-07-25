@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Yggdrasil.Data;
+using Yggdrasil.Services;
 using Yggdrasil.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHttpClient<LLMService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddServices();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=app.db"));
@@ -32,5 +33,4 @@ app.MapRazorPages();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.MapPost("/api/test", () => Results.Ok("works"));
 app.Run();

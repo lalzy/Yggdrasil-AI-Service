@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Models;
 
-namespace Yggdrasil.Data;
+namespace Yggdrasil.Services;
 
 public class AppDbContext : DbContext
 {

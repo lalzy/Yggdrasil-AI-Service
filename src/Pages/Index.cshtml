@@ -110,7 +110,7 @@
         const ids = await res.json();
         const list = document.getElementById('convList');
         list.innerHTML = ids.map(c =>
-            `<div class="conv-item ${c.conversationId === currentConvId ? 'active' : ''}" onclick="selectConversation('${c.conversationId}')">
+            `<div class="conv-item ${c.conversation_ID === currentConvId ? 'active' : ''}" onclick="selectConversation('${c.conversation_ID}')">
                 ${escapeHtml(c.title.substring(0, 30))}
                 <div class="time"></div>
             </div>`
@@ -147,7 +147,7 @@
         input.value = '';
 
         const body = currentConvId
-            ? { conversationId: currentConvId, content }
+            ? { conversation_ID: currentConvId, content }
             : { content };
 
         const res = await fetch('/api/chat', {
@@ -156,7 +156,7 @@
             body: JSON.stringify(body)
         });
         const log = await res.json();
-        currentConvId = log.conversationId;
+        currentConvId = log.conversation_ID;
 
         await loadMessages();
         await loadConversations();

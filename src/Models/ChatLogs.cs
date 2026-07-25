@@ -10,7 +10,7 @@ public enum RoleType
 public class ChatLogs()
 {
     public int Id {get; set;}
-    public Guid ConversationId {get; set;}
+    public Guid Conversation_ID {get; set;}
     public RoleType Role {get; set;}
     public string Content {get; set;} = "";
     public string? Title {get; set;}
