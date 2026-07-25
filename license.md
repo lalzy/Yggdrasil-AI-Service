@@ -1,6 +1,3 @@
-AiService
-Copyright (C) 2026 S.K.N The Lisper
-
 Licensed under the GNU Affero General Public License v3.0
 See below for full license text.
 
