@@ -3,6 +3,6 @@
     <Project Path=".tests/Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="AiService.csproj" />
+    <Project Path="Yggdrasil.csproj" />
   </Folder>
 </Solution>

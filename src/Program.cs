@@ -1,11 +1,18 @@
 using Microsoft.EntityFrameworkCore;
-using AIService.Data;
-using AIService.Endpoints;
+using Yggdrasil.Data;
+using Yggdrasil.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+    {
+        Title = "Yggdrasil - AI Scenarios",
+        Version = "v1",
+    });
+});
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>

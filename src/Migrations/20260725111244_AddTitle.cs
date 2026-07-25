@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AiService.src.Migrations
+namespace Yggdrasil.src.Migrations
 {
     /// <inheritdoc />
     public partial class AddTitle : Migration

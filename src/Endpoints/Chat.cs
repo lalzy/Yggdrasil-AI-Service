@@ -1,8 +1,8 @@
 using System.Data.Common;
-using AIService.Data;
-using AIService.Models;
+using Yggdrasil.Data;
+using Yggdrasil.Models;
 
-namespace AIService.Endpoints;
+namespace Yggdrasil.Endpoints;
 
 public static class ChatEndpoints
 {

@@ -10,6 +10,7 @@
 3. ```dotnet restore```
 4. [create database](#create-the-database)
 5. [Run service](#run-the-service).
+6. Open browser and go to [http://localhost:5242/](http://localhost:5242/)
 
 ### Create the Database
 ```
@@ -50,4 +51,4 @@ src/
 ```
 
 # API Documentation:
-Run the service, then go to ```http://localhost:5242/swagger```
+Run the service, then go to [http://localhost:5242/swagger](http://localhost:5242/swagger)

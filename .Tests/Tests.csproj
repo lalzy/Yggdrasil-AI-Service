@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AiService.csproj" />
+    <ProjectReference Include="..\Yggdrasil.csproj" />
   </ItemGroup>
 
 </Project>

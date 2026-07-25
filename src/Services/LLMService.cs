@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace AIService.Services;
+namespace Yggdrasil.Services;
 
 public class LLMService
 {

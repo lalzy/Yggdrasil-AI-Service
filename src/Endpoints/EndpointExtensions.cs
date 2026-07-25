@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace AIService.Endpoints;
+namespace Yggdrasil.Endpoints;
 
 public static class EndpointExtensions
 {
@@ -8,7 +8,7 @@ public static class EndpointExtensions
     {
         var methods = Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.IsClass && t.Namespace == "AIService.Endpoints")
+            .Where(t => t.IsClass && t.Namespace == "Yggdrasil.Endpoints")
             .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Static))
             .Where(m => m.Name.StartsWith("Map") && m != typeof(EndpointExtensions).GetMethod("MapEndpoints"));
 

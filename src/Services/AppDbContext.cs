@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using AIService.Models;
+using Yggdrasil.Models;
 
-namespace AIService.Data;
+namespace Yggdrasil.Data;
 
 public class AppDbContext : DbContext
 {

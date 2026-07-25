@@ -1,4 +1,4 @@
-namespace AIService.Models;
+namespace Yggdrasil.Models;
 
 public enum RoleType
 {
