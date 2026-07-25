@@ -1,7 +1,7 @@
 bin/
 obj/
 publish/
-migrations/
+**/Migrations/
 app.db
 *.user
 .vs/
