@@ -7,4 +7,5 @@ public class World
     public string? Description {get; set;}
     public string? NarratorInstruction {get; set;}
     public List<Character> Characters {get; set;} = new();
+    public List<LorebookEntry> Lorebook {get; set;} = new();
 }
