@@ -5,11 +5,11 @@
 
 
 # Initial Setup
-1. clone project
+1. clone project (see the shiny green button)
 2. ```cd {intoFolder}```
 3. ```dotnet restore```
-4. Create Database (see next section).
-5. Run service (see Run The Service section).
+4. [create database](#create-the-database)
+5. [Run service](#run-the-service).
 
 ### Create the Database
 ```
