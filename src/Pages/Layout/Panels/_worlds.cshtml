@@ -1,0 +1,36 @@
+<!-- _worlds.cshtml -->
+<div class="panel">
+    <div class="panel_header">
+        <span class="panel_title">Worlds</span>
+        <button class="panel_create-btn" title="Create World" onclick="openWorldForm()">&#43;</button>
+        <button class="panel_edit-btn" title="Edit worlds" onclick="toggleEditMode('worldList')">&#9998;</button>
+    </div>
+    <div class="panel_body edit-list" id="worldList"
+        data-delete-url="/api/world/"
+        data-edit-fn="openWorldForm">
+        <div class="panel_content">Loading...</div>
+    </div>
+</div>
+
+<script>
+    async function loadWorlds() {
+        const container = document.getElementById('worldList');
+        try {
+            const res  = await fetch('/api/world/all');
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="panel_content">No worlds yet</div>';
+                return;
+            }
+            container.innerHTML = data.map(w =>
+                `<div class="list-item" data-id="${w.world_ID}" onclick="onItemClick(this)">
+                    <span class="world-dot"></span>
+                    ${w.name ?? 'Untitled'}
+                    <button class="list-item_delete" onclick="event.stopPropagation(); onItemDelete(this)">&times;</button>
+                </div>`
+            ).join('');
+        } catch (err) {
+            container.innerHTML = '<div class="panel_content">Could not load worlds</div>';
+        } 
+    }
+</script>

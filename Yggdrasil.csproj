@@ -19,7 +19,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
   <ItemGroup>
-      <Content Include="src\Pages\**" LinkBase="Pages" CopyToOutputDirectory="PreserveNewest" />
+      <Content Include="src\Pages\**" 
+     
+      CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\**\*.cs" />

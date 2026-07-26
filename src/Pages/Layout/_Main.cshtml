@@ -1,0 +1,44 @@
+<!-- _main.cshtml -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AI Connect</title>
+    <link rel="stylesheet" href="~/css/shell.css" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    @* Overlay pages *@
+    <div>
+        @await Html.PartialAsync("./overlays/confirmDialog.cshtml")
+        @await Html.PartialAsync("./overlays/world.cshtml")
+    </div>
+
+    @* Overlay Base *@
+    <div>
+        @await Html.PartialAsync("_overlayPanel.cshtml")
+    </div>
+    @* Layout *@
+    <div class="app-shell">
+        @await Html.PartialAsync("Layout/_TopBar")
+
+        <div class="main-area">
+            @await Html.PartialAsync("Layout/_SidebarLeft")
+
+            <button class="collapse-btn collapse-btn--left" id="collapseLeft"
+                    onclick="toggleSidebar('left')">&lsaquo;</button>
+
+            <main class="content-area">
+                @RenderBody()
+            </main>
+
+            <button class="collapse-btn collapse-btn--right" id="collapseRight"
+                    onclick="toggleSidebar('right')">&rsaquo;</button>
+            @await Html.PartialAsync("Layout/_SidebarRight")
+        </div>
+    </div>
+    @await Html.PartialAsync("Layout/_globalScripts")
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

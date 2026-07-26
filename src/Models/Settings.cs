@@ -1,3 +1,5 @@
+/// Settings.cs
+
 namespace Yggdrasil.Models;
 
 public enum Themes

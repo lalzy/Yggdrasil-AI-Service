@@ -1,3 +1,5 @@
+/// MemoryEntry.cs
+
 namespace Yggdrasil.Models;
 
 public class MemoryEntry

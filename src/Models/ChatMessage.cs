@@ -1,3 +1,5 @@
+/// ChatMessage.cs
+
 namespace Yggdrasil.Models;
 
 public enum RoleType
@@ -7,13 +9,12 @@ public enum RoleType
     user=2,
 }
 
-public class ChatLogs()
+public class ChatMessage()
 {
     public Guid ID {get; set;}
-    public Guid World_ID {get; set;}
+    public Guid Conversation_ID {get; set;}
     public RoleType Role {get; set;}
     public string Content {get; set;} = "";
-    public string? Title {get; set;}
     public DateTime TimeStamp {get; set;}
 
 }

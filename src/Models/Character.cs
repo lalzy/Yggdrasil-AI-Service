@@ -1,3 +1,5 @@
+/// Character.cs
+
 namespace Yggdrasil.Models;
 
 public class Character
@@ -12,4 +14,6 @@ public class Character
     public String? Race {get; set;}
     public String? Equipment {get; set;}
     public List<World> Worlds {get; set;} = new();
+    public DateTime CreatedAt {get; set;}
+    public DateTime UpdatedAt {get; set;}
 }

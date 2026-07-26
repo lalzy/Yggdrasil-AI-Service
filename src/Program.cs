@@ -1,6 +1,7 @@
+// Program.cs
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Services;
-using Yggdrasil.Endpoints;
+using Yggdrasil.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpClient<LLMService>();
@@ -15,22 +16,34 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddServices();
+builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=app.db",
     x=>x.MigrationsAssembly("Yggdrasil")));
-
+    
 builder.Services.AddRazorPages().AddRazorPagesOptions(options => {
     options.RootDirectory = "/src/Pages";
 });
 
-
-
 var app = builder.Build();
-app.MapEndpoints();
 
+// Seed the DB
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (!db.Set<Yggdrasil.Models.Settings>().Any())
+    {
+        db.Set<Yggdrasil.Models.Settings>().Any();
+        db.Set<Yggdrasil.Models.Settings>().Add(new Yggdrasil.Models.Settings());
+        db.SaveChanges();
+    }
+}
+
+app.MapControllers();
+
+app.UseStaticFiles();
 app.MapRazorPages();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 

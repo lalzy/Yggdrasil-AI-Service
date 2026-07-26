@@ -1,0 +1,70 @@
+<!-- _globalScripts.cshtml -->
+<script>
+    const sidebarState = { left: true, right: true };
+
+    let _confirmResolve = null;
+
+    function showConfirm(message) {
+        return new Promise((resolve) => {
+            _confirmResolve = resolve;
+            document.getElementById('confirmMessage').textContent = message;
+            openOverlay('confirmDialog');
+        });
+    }
+
+    document.getElementById('confirmYes').onclick = () => { closeOverlay(); _confirmResolve?.(true); };
+    document.getElementById('confirmNo').onclick = () => { closeOverlay(); _confirmResolve?.(false); };
+    
+    function toggleEditMode(listId) {
+        const list = document.getElementById(listId);
+        list.classList.toggle('edit-mode');
+    }
+
+    function onItemClick(el) {
+        const list = el.closest('.edit-list');
+        if (list.classList.contains('edit-mode')) {
+            const fn = list.dataset.editFn;
+            const id = el.dataset.id;
+            window[fn](id);
+        }
+    }
+
+    async function onItemDelete(el) {
+        const item = el.closest('.list-item');
+        const list = item.closest('.edit-list');
+        const id = item.dataset.id;
+        const url = list.dataset.deleteUrl + id;
+
+        if (!await showConfirm('Delete?')) return;
+        await fetch(url, { method: 'DELETE' });
+        item.remove();
+        loadWorlds();
+    }
+
+    function toggleSidebar(side) {
+        sidebarState[side] = !sidebarState[side];
+        const sb  = document.getElementById(side === 'left' ? 'sidebarLeft' : 'sidebarRight');
+        const btn = document.getElementById(side === 'left' ? 'collapseLeft' : 'collapseRight');
+        sb.classList.toggle('collapsed', !sidebarState[side]);
+        if (side === 'left')  btn.innerHTML = sidebarState[side] ? '&lsaquo;' : '&rsaquo;';
+        if (side === 'right') btn.innerHTML = sidebarState[side] ? '&rsaquo;' : '&lsaquo;';
+    }
+
+    function openOverlay(contentId) {
+        // Hide all overlay contents
+        document.querySelectorAll('.overlay-content').forEach(el => el.style.display = 'none');
+        // Show the requested one and move it into the panel
+        const content = document.getElementById(contentId);
+        document.getElementById('overlayContent').appendChild(content);
+        content.style.display = 'block';
+        document.getElementById('overlayBackdrop').classList.add('open');
+        document.getElementById('overlayPanel').classList.add('open');
+    }
+    function closeOverlay(){
+        document.getElementById("overlayPanel").querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+        document.getElementById("overlayBackdrop").classList.remove("open");
+        document.getElementById("overlayPanel").classList.remove("open");
+    }
+
+    document.addEventListener('DOMContentLoaded', loadWorlds);
+</script>

@@ -1,5 +1,7 @@
+// SettingsService.cs
 using Yggdrasil.Models;
 using Yggdrasil.Util;
+using Yggdrasil.Data;
 
 namespace Yggdrasil.Services;
 
@@ -10,7 +12,14 @@ public class SettingsService{
     {
         _db = db;
     }
-
+    public List<Settings> getAll()
+    {
+        return _db.Set<Settings>().ToList();
+    }
+    /// <summary>
+    /// Get the current Theme selected
+    /// </summary>
+    /// <returns>Theme object</returns>
     public ServiceResult<Themes> getTheme()
     {
         var theme = _db.Set<Settings>().Select(s=>s.Theme).Distinct().FirstOrDefault();
