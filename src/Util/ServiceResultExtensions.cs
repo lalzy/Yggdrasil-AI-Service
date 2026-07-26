@@ -19,6 +19,10 @@ public static class ServiceResultExtensions
         {
             return action().ToResponse();
         }
+        catch (ArgumentException ex)
+        {
+            return ServiceResult<T>.BadRequest(ex.Message).ToResponse();
+        }
         catch (Exception ex)
         {
             return ServiceResult<T>.InternalError(ex.Message).ToResponse();

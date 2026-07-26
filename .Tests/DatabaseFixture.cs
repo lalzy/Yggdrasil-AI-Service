@@ -8,28 +8,37 @@ using Microsoft.EntityFrameworkCore;
 public class DatabaseFixture : IDisposable
 {
     public SqliteConnection Connection { get; }
-    public AppDbContext Db { get; }
+    public DbContextOptions<AppDbContext> Options { get; }
 
+    protected readonly DatabaseFixture _fixture;
+    
     public DatabaseFixture()
     {
         Connection = new SqliteConnection("Data Source=:memory:");
         Connection.Open();
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
+        Options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(Connection)
             .Options;
 
-        Db = new AppDbContext(options);
-        Db.Database.EnsureCreated();
-
-        // Seed global data
-        Db.Set<Settings>().Add(new Settings());
-        Db.SaveChanges();
+        using var db = new AppDbContext(Options);
+        db.Database.EnsureCreated();
+        db.Set<Settings>().Add(new Settings());
+        db.SaveChanges();
     }
 
-    public void Dispose()
+    public void Reset()
     {
-        Db.Dispose();
-        Connection.Dispose();
+        using var db = CreateContext();
+        foreach (var entity in db.Model.GetEntityTypes())
+        {
+            if (entity.ClrType == typeof(Settings)) continue;
+            var dbSet = db.Model.FindEntityType(entity.ClrType);
+            db.Database.ExecuteSqlRaw($"DELETE FROM \"{entity.GetTableName()}\"");
+        }
     }
+    
+    public AppDbContext CreateContext() => new AppDbContext(Options);
+
+    public void Dispose() => Connection.Dispose();
 }

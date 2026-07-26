@@ -5,6 +5,7 @@ using Yggdrasil.Util;
 using Yggdrasil.Data;
 
 using Yggdrasil.DTO;
+using SQLitePCL;
 namespace Yggdrasil.Services;
 
 
@@ -25,8 +26,10 @@ public class WorldService
     public ServiceResult<List<WorldSummary>> getWorlds(int? count=null)
     {
         var query = _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description)).Distinct();
-
-        if(count.HasValue) query = query.Take(count.Value);
+        if(count.HasValue){ 
+            if(count < 1) throw new ArgumentException("Less than 1 requested"); 
+            query = query.Take(count.Value);
+        }
         return new(query.ToList());
     }
 

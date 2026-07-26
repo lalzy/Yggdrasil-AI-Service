@@ -9,7 +9,7 @@ public enum Themes
 }
 public class Settings
 {
-    const string NARRATION_PROMPT = "You are an narrator!";
+    public const string NARRATION_PROMPT = "You are an narrator!";
     public Guid ID {get; set;}
     public string DefaultPrompt {get; set;} = NARRATION_PROMPT;
     public Themes Theme {get;set;} = Themes.dark;

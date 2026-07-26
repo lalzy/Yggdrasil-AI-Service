@@ -1,21 +1,19 @@
 // WorldServiceTests.cs
 
-using Yggdrasil.Models;
 using Yggdrasil.Services;
-using Yggdrasil.Data;
 using Bogus;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Yggdrasil.DTO;
+using Yggdrasil.Models;
+using Microsoft.EntityFrameworkCore;
 
-public class WorldServiceTests : IClassFixture<DatabaseFixture>
+public class WorldServiceTests : DatabaseTestBase
 {
     private readonly WorldService _service;
     private readonly Faker _faker = new();
 
-    public WorldServiceTests(DatabaseFixture fixture)
+    public WorldServiceTests(DatabaseFixture fixture) : base(fixture)
     {
-        _service = new WorldService(fixture.Db);
+        _service = new WorldService(fixture.CreateContext());
     }
     // Helpers
     private WorldRequest CreateWorldRequest(string? NarratorInstruction = null)
@@ -54,5 +52,47 @@ public class WorldServiceTests : IClassFixture<DatabaseFixture>
 
         var fetched = _service.getWorlds(toGet).Data;
         Assert.Equal(toGet, fetched.Count);
+    }
+
+    [Fact]
+    public void createWorlds_Success()
+    {
+        var request = CreateWorldRequest("someCustomInstruction");
+        var result = _service.createWorld(request).Data;
+
+        Assert.Equivalent(request, result);
+    }
+
+    [Fact]
+    public void createWorlds_DefaultInstruction()
+    {
+        var result = _service.createWorld(CreateWorldRequest()).Data;
+
+        Assert.Equal(Yggdrasil.Models.Settings.NARRATION_PROMPT, result.NarratorInstruction);
+    }
+
+    [Fact]
+    public void DeleteWorlds_DeletesTheWorld()
+    {
+        var world_ID = _service.createWorld(CreateWorldRequest()).Data!.ID;
+
+        Assert.True(_service.getWorld(world_ID).Data != null);
+
+        _service.DeleteWorld(world_ID);
+
+        Assert.True(_service.getWorld(world_ID).Data == null);
+    }
+
+    [Fact]
+    public void DeleteWorlds_OnlyDeleteSelectedWorld()
+    {
+        createWorlds(1);
+        var world_ID = _service.createWorld(CreateWorldRequest()).Data!.ID;
+        createWorlds(1);
+        Assert.Equal(3, _service.getWorlds().Data!.Count);
+        _service.DeleteWorld(world_ID);
+        var fetch = _service.getWorlds().Data!;
+        Assert.Equal(2, fetch.Count);
+        Assert.DoesNotContain(fetch, w=>w.world_ID == world_ID);
     }
 }
