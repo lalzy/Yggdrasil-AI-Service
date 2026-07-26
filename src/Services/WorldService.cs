@@ -23,7 +23,7 @@ public class WorldService
     /// </summary>
     /// <param name="count">How many records to fetch</param>
     /// <returns>All word records as a list</returns>
-    public ServiceResult<List<WorldSummary>> getWorlds(int? count=null)
+    public ServiceResult<List<WorldSummary>> GetWorlds(int? count=null)
     {
         var query = _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description)).Distinct();
         if(count.HasValue){ 
@@ -38,10 +38,10 @@ public class WorldService
     /// </summary>
     /// <param name="world_ID"></param>
     /// <returns>World Object or null with error text.</returns>
-    public ServiceResult<World> getWorld(Guid world_ID)
+    public ServiceResult<World> GetWorld(Guid world_ID)
     {
         var world = _db.Set<World>().Where(w=>w.ID == world_ID).Distinct().FirstOrDefault();
-        if (world == null) return new ServiceResult<World>(null, ErrorMessages.WORLD_NOT_EXIST);
+        if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         return new ServiceResult<World>(world);
     }
 
@@ -52,7 +52,7 @@ public class WorldService
     /// <param name="description">Description of the world</param>
     /// <param name="narratorInstructions">A custom instruction if desired</param>
     /// <returns>World object</returns>
-    public ServiceResult<World> createWorld(WorldRequest request)
+    public ServiceResult<World> CreateWorld(WorldRequest request)
     {
         var world =  new World
         {
@@ -75,7 +75,7 @@ public class WorldService
     public ServiceResult<bool> DeleteWorld(Guid world_ID)
     {
         var world = _db.Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world_ID);
-        if (world == null) return new ServiceResult<bool>(false, ErrorMessages.WORLD_NOT_EXIST);
+        if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         world.Characters.Clear();
         _db.Set<World>().Remove(world);
         _db.SaveChanges();
@@ -89,12 +89,12 @@ public class WorldService
     /// <param name="world_ID"></param>
     /// <param name="character_ID">ID of character to add to the world</param>
     /// <returns>The Character</returns>
-    public ServiceResult<Character> addCharacter(Guid world_ID, Guid character_ID)
+    public ServiceResult<Character> AddCharacter(Guid world_ID, Guid character_ID)
     {
         var world = _db.Set<World>().Where(w => w.ID == world_ID).Distinct().FirstOrDefault();
-        if(world == null) return new ServiceResult<Character>(null, ErrorMessages.WORLD_NOT_EXIST);
+        if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         var character = _db.Set<Character>().Where(c=>c.ID == character_ID).Distinct().FirstOrDefault();
-        if(character == null) return new ServiceResult<Character>(null, ErrorMessages.CHARACTER_NOT_EXIST);
+        if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
 
         world.Characters.Add(character);
 
@@ -108,12 +108,12 @@ public class WorldService
     /// <param name="world_ID"></param>
     /// <param name="character_ID"></param>
     /// <returns>True if successfull</returns>
-    public ServiceResult<bool> removeCharacter(Guid world_ID, Guid character_ID)
+    public ServiceResult<bool> RemoveCharacter(Guid world_ID, Guid character_ID)
     {
         var world = _db.Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world_ID);
-        if (world == null) return new ServiceResult<bool>(false, ErrorMessages.WORLD_NOT_EXIST);
+        if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         var character = world.Characters.FirstOrDefault(c=>c.ID == character_ID);
-        if(character == null) return new ServiceResult<bool>(false, ErrorMessages.CHARACTER_NOT_IN_WORLD);
+        if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
         world.Characters.Remove(character);
         _db.SaveChanges();
 

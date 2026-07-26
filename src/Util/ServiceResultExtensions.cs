@@ -1,5 +1,6 @@
 // ServiceResultExtensions.cs
 using Microsoft.AspNetCore.Mvc;
+using SQLitePCL;
 
 namespace Yggdrasil.Util;
 
@@ -22,6 +23,10 @@ public static class ServiceResultExtensions
         catch (ArgumentException ex)
         {
             return ServiceResult<T>.BadRequest(ex.Message).ToResponse();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return ServiceResult<T>.NotFound(ex.Message).ToResponse();
         }
         catch (Exception ex)
         {
