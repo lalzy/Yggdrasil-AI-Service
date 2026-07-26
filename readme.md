@@ -12,12 +12,6 @@
 5. [Run service](#run-the-service).
 6. Open browser and go to [http://localhost:5242/](http://localhost:5242/)
 
-### Create the Database
-```
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-```
-
 # Run The Service
 Type ```dotnet Run``` in a terminal/command prompt (bash, powershell, cmd) pointed to the root (where you cloned the project to).
 
