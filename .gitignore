@@ -2,6 +2,8 @@ bin/
 obj/
 publish/
 **/Migrations/
-app.db
+*.db
+*.db-shm
+*.db-wal
 *.user
 .vs/
