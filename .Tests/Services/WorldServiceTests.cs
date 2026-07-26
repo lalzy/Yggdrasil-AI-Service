@@ -18,6 +18,7 @@ public class WorldServiceTests : DatabaseTestBase
         _service = new WorldService(fixture.CreateContext());
     }
     // Helpers
+
     private WorldRequest CreateWorldRequest(string? NarratorInstruction = null)
     {
         return new WorldRequest
@@ -27,7 +28,6 @@ public class WorldServiceTests : DatabaseTestBase
             NarratorInstruction = NarratorInstruction,
         };
     }
-
 
     private void CreateWorlds (int count=1)
     {
@@ -159,7 +159,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void AddCharacter_CharacterIsAdded()
     {
         var result = _service.CreateWorld(CreateWorldRequest()).Data!;
-        var character = CreateHelpers.CreateCharacter(_fixture, result.ID);
+        var character = Factory.CreateCharacter(_fixture);
 
         
         Assert.Empty(GetCharactersFromDB(result.ID));
@@ -172,7 +172,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void AddCharacter_InvalidWorldGuidThrows()
     {
         var result = _service.CreateWorld(CreateWorldRequest()).Data!;
-        var character = CreateHelpers.CreateCharacter(_fixture, result.ID);
+        var character = Factory.CreateCharacter(_fixture, result.ID);
         Assert.Throws<KeyNotFoundException>(()=>_service.AddCharacter(_faker.Random.Guid(), character.ID));
     }
 
@@ -187,8 +187,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void RemoveCharacter_CharacterIsRemoved()
     {
         var result = _service.CreateWorld(CreateWorldRequest()).Data!;
-        var character = CreateHelpers.CreateCharacter(_fixture, result.ID);
-        _service.AddCharacter(result.ID, character.ID);
+        var character = Factory.CreateCharacter(_fixture, result.ID);
 
         Assert.NotEmpty(GetCharactersFromDB(result.ID));
         _service.RemoveCharacter(result.ID, character.ID);
@@ -199,7 +198,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void RemoveCharacter_InvalidWorldGuidThrows()
     {
         var world_ID = _service.CreateWorld(CreateWorldRequest()).Data!.ID;
-        var character = CreateHelpers.CreateCharacter(_fixture, world_ID);
+        var character = Factory.CreateCharacter(_fixture, world_ID);
         Assert.Throws<KeyNotFoundException>(()=>_service.RemoveCharacter(_faker.Random.Guid(), character.ID));
     }
 

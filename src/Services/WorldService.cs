@@ -117,6 +117,6 @@ public class WorldService
         world.Characters.Remove(character);
         _db.SaveChanges();
 
-        return new ServiceResult<bool>(true);
+        return ServiceResult<bool>.NoContent();
     }
 }
