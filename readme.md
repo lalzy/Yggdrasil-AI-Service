@@ -14,7 +14,7 @@
 
 ### Create the Database
 ```
-dotnet ef migrations add InitialCreate -o src/migrations
+dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
