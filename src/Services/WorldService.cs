@@ -3,21 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Models;
 using Yggdrasil.Util;
 using Yggdrasil.Data;
-
 using Yggdrasil.DTO;
-using SQLitePCL;
+
 namespace Yggdrasil.Services;
 
 
-public class WorldService
+public class WorldService(AppDbContext db)
 {
-    private readonly AppDbContext _db;
-    public WorldService(AppDbContext db)
-    {
-        _db = db;
-    }
+    private readonly AppDbContext _db = db;
 
-    public record WorldSummary(Guid world_ID, string Name, string Description);
     /// <summary>
     /// Get all world as a SummaryRecord.
     /// </summary>
@@ -27,7 +21,7 @@ public class WorldService
     {
         var query = _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description));
         if(count.HasValue){ 
-            if(count < 1) throw new ArgumentException("Less than 1 requested"); 
+            if(count < 1) throw new ArgumentException(ErrorMessages.LESSTHANONE); 
             query = query.Take(count.Value);
         }
         return new(query.ToList());

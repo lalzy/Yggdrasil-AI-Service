@@ -5,8 +5,10 @@ using Bogus;
 using Yggdrasil.DTO;
 using Yggdrasil.Models;
 using Microsoft.EntityFrameworkCore;
-using Yggdrasil.Tests.Helpers;
+using Yggdrasil.Tests.Utility;
 using System.Runtime.InteropServices;
+
+namespace Yggdrasil.Tests.Services;
 
 public class WorldServiceTests : DatabaseTestBase
 {

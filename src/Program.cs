@@ -4,7 +4,6 @@ using Yggdrasil.Services;
 using Yggdrasil.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddHttpClient<LLMService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

@@ -2,7 +2,7 @@ using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Data;
 using Yggdrasil.Models;
-namespace Yggdrasil.Tests.Helpers;
+namespace Yggdrasil.Tests.Utility;
 
 public static class Factory
 {
@@ -33,6 +33,7 @@ public static class Factory
         var character = new Character
         {
             Name = faker.Name.FullName(),
+            Description = faker.Lorem.Lines(),
             Occupation = faker.Lorem.Lines(),
             NarrativeRole = faker.Lorem.Lines(),
             Appearance = faker.Lorem.Lines(),

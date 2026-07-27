@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Text.Json;
 using System.Net;
 using Bogus;
-using Yggdrasil.Tests.Helpers;
+using Yggdrasil.Tests.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Data;
@@ -12,6 +12,8 @@ using Microsoft.Data.Sqlite;
 using SQLitePCL;
 using Yggdrasil.Models;
 using Microsoft.AspNetCore.Mvc;
+
+namespace Yggdrasil.Tests.Controllers;
 
 public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>>
 {
