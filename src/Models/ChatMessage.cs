@@ -9,12 +9,12 @@ public enum RoleType
     user=2,
 }
 
-public class ChatMessage()
+public class ChatMessage
 {
     public Guid ID {get; set;}
     public Guid Conversation_ID {get; set;}
-    public RoleType Role {get; set;}
-    public string Content {get; set;} = "";
-    public DateTime TimeStamp {get; set;}
+    public required RoleType Role {get; set;}
+    public required string Content {get; set;}
+    public DateTime TimeStamp {get; set;} = DateTime.UtcNow;
 
 }

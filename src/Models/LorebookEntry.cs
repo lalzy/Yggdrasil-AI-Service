@@ -6,7 +6,9 @@ public class LorebookEntry
 {
     public Guid ID {get; set;}
     public Guid Lorebook_ID {get; set;}
-    public String? Name {get;set;}
-    public String? Content {get; set;}
-    public List<String> Keywords {get; set;} = new();
+    public required string Name {get;set;}
+    public required string Content {get; set;}
+    public List<string> Keywords {get; set;} = [];
+    public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
+    public DateTime UpdatedAt {get; set;} = DateTime.UtcNow;
 }

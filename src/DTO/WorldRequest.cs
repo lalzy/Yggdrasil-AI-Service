@@ -6,7 +6,7 @@ namespace Yggdrasil.DTO;
 
 public class WorldRequest
 {
-    public Guid Lorebook_ID {get; set;}
+    public Guid? Lorebook_ID {get; set;}
     [Required]
     [MinLength(1)]
     public string? Name {get; set;}

@@ -6,14 +6,14 @@ public class Character
 {
     public Guid ID {get; set;}
     public List<Guid> World_IDs {get; set;} = new();
-    public String? Name {get; set;}
-    public String? Occupation {get; set;}
-    public String? NarrativeRole {get; set;}
-    public String? Appearance {get; set;}
-    public String? Personality {get; set;}
-    public String? Gender {get; set;}
-    public String? Race {get; set;}
-    public String? Equipment {get; set;}
-    public DateTime CreatedAt {get; set;}
-    public DateTime UpdatedAt {get; set;}
+    public required string Name {get; set;}
+    public required string Gender {get; set;}
+    public required string Personality {get; set;}
+    public string? Race {get; set;}
+    public string? Occupation {get; set;}
+    public string? NarrativeRole {get; set;}
+    public string? Appearance {get; set;}
+    public string? Equipment {get; set;}
+    public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
+    public DateTime UpdatedAt {get; set;} = DateTime.UtcNow;
 }
