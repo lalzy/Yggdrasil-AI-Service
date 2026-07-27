@@ -25,7 +25,7 @@ public class WorldService
     /// <returns>All word records as a list</returns>
     public ServiceResult<List<WorldSummary>> GetWorlds(int? count=null)
     {
-        var query = _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description)).Distinct();
+        var query = _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description));
         if(count.HasValue){ 
             if(count < 1) throw new ArgumentException("Less than 1 requested"); 
             query = query.Take(count.Value);
@@ -40,7 +40,7 @@ public class WorldService
     /// <returns>World Object or null with error text.</returns>
     public ServiceResult<World> GetWorld(Guid world_ID)
     {
-        var world = _db.Set<World>().Where(w=>w.ID == world_ID).Distinct().FirstOrDefault();
+        var world = _db.Set<World>().Where(w=>w.ID == world_ID).FirstOrDefault();
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         return new ServiceResult<World>(world);
     }
@@ -58,7 +58,7 @@ public class WorldService
         {
             Name = request.Name,
             Description = request.Description,
-            NarratorInstruction = (request.NarratorInstruction != null) ? request.NarratorInstruction : _db.Set<Yggdrasil.Models.Settings>().First().DefaultPrompt
+            NarratorInstruction = request.NarratorInstruction ?? _db.Set<Yggdrasil.Models.Settings>().First().DefaultPrompt
         };
 
         _db.Set<World>().Add(world);
@@ -91,9 +91,9 @@ public class WorldService
     /// <returns>The Character</returns>
     public ServiceResult<Character> AddCharacter(Guid world_ID, Guid character_ID)
     {
-        var world = _db.Set<World>().Where(w => w.ID == world_ID).Distinct().FirstOrDefault();
+        var world = _db.Set<World>().Where(w => w.ID == world_ID).FirstOrDefault();
         if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
-        var character = _db.Set<Character>().Where(c=>c.ID == character_ID).Distinct().FirstOrDefault();
+        var character = _db.Set<Character>().Where(c=>c.ID == character_ID).FirstOrDefault();
         if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
 
         world.Characters.Add(character);
@@ -114,6 +114,7 @@ public class WorldService
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         var character = world.Characters.FirstOrDefault(c=>c.ID == character_ID);
         if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
+        
         world.Characters.Remove(character);
         _db.SaveChanges();
 
