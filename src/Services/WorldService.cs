@@ -35,7 +35,7 @@ public class WorldService(AppDbContext db)
     /// <returns>World Object or null with error text.</returns>
     public ServiceResult<World> GetOne(Guid world_ID)
     {
-        var world = _db.Set<World>().Where(w=>w.ID == world_ID).FirstOrDefault();
+        var world = _db.Set<World>().Where(w=>w.ID == world_ID).Include(w=>w.Characters).FirstOrDefault();
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         return new ServiceResult<World>(world);
     }

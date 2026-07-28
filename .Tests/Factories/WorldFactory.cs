@@ -10,6 +10,7 @@ public class WorldFactory{
     public static World Create(AppDbContext db)
     {
         var world = AutoFaker.Generate<World>();
+        world.Characters.Clear();
         
         db.Set<World>().Add(world);
         db.SaveChanges();

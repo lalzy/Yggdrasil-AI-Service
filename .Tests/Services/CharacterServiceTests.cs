@@ -108,9 +108,9 @@ public class CharacterServiceTests :DatabaseTestBase
         character.ID = Guid.Empty; // Request doesn't have ID.
         Assert.Equivalent(convertedRequest, character, strict:false);
 
+        character.ID = ID; // add ID back for DB Check
         // Check for DB:
         var fetched = _fixture.CreateContext().Set<Character>().FirstOrDefault(c=>c.ID == ID);
-
-        Assert.Throws<EquivalentException>(()=>Assert.Equivalent(character, fetched));
+        Assert.Equivalent(character, fetched);
     }
 }
