@@ -29,7 +29,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void CharactersGetList_GetAll()
+    public void GetAll_GetAllMade()
     {
         int count = _faker.Random.Int(20, 30);
         CreateCharacters(count);
@@ -40,7 +40,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void CharactersGetList_GetOnlyRequestedAmoun()
+    public void GetAll_GetOnlyRequestedAmoun()
     {
         int count = 20;
         int toGet = 5;
@@ -51,7 +51,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void CharactersGetList_ReturnsCorrectServiceREsultType()
+    public void GetAll_ReturnsCorrectServiceREsultType()
     {
         CreateCharacters(3);
         var fetch = _service.GetAll();
@@ -60,7 +60,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void CharactersGetList_ThrowsOnInvalidCount()
+    public void GetAll_ThrowsOnInvalidCount()
     {
         CreateCharacters(3);
         Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));

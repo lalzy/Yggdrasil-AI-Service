@@ -7,6 +7,7 @@ using Yggdrasil.Models;
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Tests.Utility;
 using System.Runtime.InteropServices;
+using Yggdrasil.Util;
 
 namespace Yggdrasil.Tests.Services;
 
@@ -31,7 +32,7 @@ public class WorldServiceTests : DatabaseTestBase
         };
     }
 
-    private void Creates (int count=1)
+    private void CreateWorlds (int count=1)
     {
         for(int i = 0; i < count; i++)
         {
@@ -49,8 +50,8 @@ public class WorldServiceTests : DatabaseTestBase
     [Fact]
     public void GetAll_GetAllWorldsMade()
     {
-        int count = _faker.Random.Int(3,10);
-        Creates(count);
+        int count = _faker.Random.Int(20,30);
+        CreateWorlds(count);
         var fetched = _service.GetAll().Data;
         Assert.Equal(count, fetched.Count);
     }
@@ -59,17 +60,26 @@ public class WorldServiceTests : DatabaseTestBase
     public void GetAll_GetOnlyRequestedAmount()
     {
         int count = 10;
-        int toGet = _faker.Random.Int(1,7);
-        Creates(count);
+        int toGet = 3;
+        CreateWorlds(count);
 
         var fetched = _service.GetAll(toGet).Data;
         Assert.Equal(toGet, fetched.Count);
     }
 
     [Fact]
+    public void GetAll_ReturnsCorrectServiceResultType()
+    {
+        CreateWorlds(3);
+        var fetch = _service.GetAll();
+
+        Assert.IsType<ServiceResult<List<WorldSummary>>>(fetch);
+    }
+
+    [Fact]
     public void GetAll_LessThanOneCountThrows()
     {
-        Creates(3);
+        CreateWorlds(3);
         Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
     }
 
@@ -84,9 +94,9 @@ public class WorldServiceTests : DatabaseTestBase
     [Fact]
     public void GetOne_GetCorrectWorldFromMany()
     {
-        Creates(2);
+        CreateWorlds(2);
         var world = _service.Create(CreateRequest(_faker.Lorem.Lines())).Data!;
-        Creates(2);
+        CreateWorlds(2);
         var fetch = _service.GetOne(world.ID).Data!;
         Assert.Equivalent(world, fetch);
     }
@@ -132,9 +142,9 @@ public class WorldServiceTests : DatabaseTestBase
     [Fact]
     public void Deletes_OnlyRequestedWorldDeletes()
     {
-        Creates(1);
+        CreateWorlds(1);
         var world_ID = _service.Create(CreateRequest()).Data!.ID;
-        Creates(1);
+        CreateWorlds(1);
         Assert.Equal(3, _service.GetAll().Data!.Count);
         _service.Delete(world_ID);
         var fetch = _service.GetAll().Data!;
@@ -153,7 +163,7 @@ public class WorldServiceTests : DatabaseTestBase
     [Fact]
     public void Deletes_InvalidGuidThrows()
     {
-        Creates(1);
+        CreateWorlds(1);
         Assert.Throws<KeyNotFoundException>(()=>_service.Delete(_faker.Random.Guid()));
     }
 
