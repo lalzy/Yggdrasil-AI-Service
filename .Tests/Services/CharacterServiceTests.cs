@@ -65,4 +65,32 @@ public class CharacterServiceTests :DatabaseTestBase
         CreateCharacters(3);
         Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
     }
+
+    [Fact]
+    public void GetOne_GetRequested()
+    {
+        var character = Factory.CreateCharacter(_fixture.CreateContext());
+        var fetch = _service.GetOne(character.ID).Data!;
+
+        Assert.Equivalent(character, fetch);
+    }
+
+    [Fact]
+    public void GetOne_GetCorrectFromMany()
+    {
+        CreateCharacters(2);
+        var character = Factory.CreateCharacter(_fixture.CreateContext());
+        CreateCharacters(2);
+
+        var fetch = _service.GetOne(character.ID).Data!;
+
+        Assert.Equivalent(character, fetch);
+    }
+
+    [Fact]
+    public void GetOne_InvalidGuidThrows()
+    {
+        CreateCharacters(2);
+        Assert.Throws<KeyNotFoundException>(()=>_service.GetOne(_faker.Random.Uuid()));
+    }
 }

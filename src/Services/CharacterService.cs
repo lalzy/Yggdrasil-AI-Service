@@ -21,4 +21,11 @@ public class CharacterService(AppDbContext db)
 
         return new (query.ToList());
     }
+
+    public ServiceResult<Character> GetOne(Guid character_ID)
+    {
+        var world = _db.Set<Character>().FirstOrDefault(c=>c.ID == character_ID);
+        if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
+        return new (world);
+    }
 }
