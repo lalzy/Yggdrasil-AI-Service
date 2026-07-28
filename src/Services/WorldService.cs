@@ -17,7 +17,7 @@ public class WorldService(AppDbContext db)
     /// </summary>
     /// <param name="count">How many records to fetch</param>
     /// <returns>All word records as a list</returns>
-    public ServiceResult<List<WorldSummary>> GetWorlds(int? count=null)
+    public ServiceResult<List<WorldSummary>> GetAll(int? count=null)
     {
         var query = _db.Set<World>().Where<World>(w=>w.Name != null).Select(w=> new WorldSummary(w.ID, w.Name, w.Description));
         if(count.HasValue){ 
@@ -32,7 +32,7 @@ public class WorldService(AppDbContext db)
     /// </summary>
     /// <param name="world_ID"></param>
     /// <returns>World Object or null with error text.</returns>
-    public ServiceResult<World> GetWorld(Guid world_ID)
+    public ServiceResult<World> GetOne(Guid world_ID)
     {
         var world = _db.Set<World>().Where(w=>w.ID == world_ID).FirstOrDefault();
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
@@ -46,7 +46,7 @@ public class WorldService(AppDbContext db)
     /// <param name="description">Description of the world</param>
     /// <param name="narratorInstructions">A custom instruction if desired</param>
     /// <returns>World object</returns>
-    public ServiceResult<World> CreateWorld(WorldRequest request)
+    public ServiceResult<World> Create(WorldRequest request)
     {
         var world =  new World
         {
@@ -66,7 +66,7 @@ public class WorldService(AppDbContext db)
     /// </summary>
     /// <param name="world_ID"></param>
     /// <returns>Boolean true if successfull, false with error if not</returns>
-    public ServiceResult<bool> DeleteWorld(Guid world_ID)
+    public ServiceResult<bool> Delete(Guid world_ID)
     {
         var world = _db.Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world_ID);
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
