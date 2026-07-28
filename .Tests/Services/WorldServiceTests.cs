@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Tests.Utility;
 using System.Runtime.InteropServices;
 using Yggdrasil.Util;
+using Yggdrasil.Tests.Factories;
 
 namespace Yggdrasil.Tests.Services;
 
@@ -171,7 +172,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void AddCharacter_CharacterIsAdded()
     {
         var result = _service.Create(CreateRequest()).Data!;
-        var character = Factory.CreateCharacter(_fixture);
+        var character = CharacterFactory.CreateCharacter(_fixture);
 
         
         Assert.Empty(GetCharactersFromDB(result.ID));
@@ -184,7 +185,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void AddCharacter_InvalidWorldGuidThrows()
     {
         var result = _service.Create(CreateRequest()).Data!;
-        var character = Factory.CreateCharacter(_fixture, result.ID);
+        var character = CharacterFactory.CreateCharacter(_fixture, result.ID);
         Assert.Throws<KeyNotFoundException>(()=>_service.AddCharacter(_faker.Random.Guid(), character.ID));
     }
 
@@ -199,7 +200,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void RemoveCharacter_CharacterIsRemoved()
     {
         var result = _service.Create(CreateRequest()).Data!;
-        var character = Factory.CreateCharacter(_fixture, result.ID);
+        var character = CharacterFactory.CreateCharacter(_fixture, result.ID);
 
         Assert.NotEmpty(GetCharactersFromDB(result.ID));
         _service.RemoveCharacter(result.ID, character.ID);
@@ -210,7 +211,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void RemoveCharacter_InvalidWorldGuidThrows()
     {
         var world_ID = _service.Create(CreateRequest()).Data!.ID;
-        var character = Factory.CreateCharacter(_fixture, world_ID);
+        var character = CharacterFactory.CreateCharacter(_fixture, world_ID);
         Assert.Throws<KeyNotFoundException>(()=>_service.RemoveCharacter(_faker.Random.Guid(), character.ID));
     }
 

@@ -1,10 +1,14 @@
 // CharacterServiceTests.cs
 using Bogus;
+using AutoBogus;
 using Yggdrasil.Tests.Utility;
+using Yggdrasil.Tests.Factories;
 using Yggdrasil.Services;
 using Yggdrasil.Models;
 using Yggdrasil.DTO;
 using Yggdrasil.Util;
+using yggdrasil.Util;
+using Xunit.Sdk;
 
 namespace Yggdrasil.Tests.Services;
 
@@ -24,7 +28,7 @@ public class CharacterServiceTests :DatabaseTestBase
         var context = _fixture.CreateContext();
         for(int i = 0; i < count; i++)
         {
-            Factory.CreateCharacter(context, world_ID);
+            CharacterFactory.CreateCharacter(context, world_ID);
         }
     }
 
@@ -40,7 +44,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_GetOnlyRequestedAmoun()
+    public void GetAll_GetOnlyRequestedAmount()
     {
         int count = 20;
         int toGet = 5;
@@ -51,7 +55,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_ReturnsCorrectServiceREsultType()
+    public void GetAll_ReturnsCorrectServiceResultType()
     {
         CreateCharacters(3);
         var fetch = _service.GetAll();
@@ -69,7 +73,7 @@ public class CharacterServiceTests :DatabaseTestBase
     [Fact]
     public void GetOne_GetRequested()
     {
-        var character = Factory.CreateCharacter(_fixture.CreateContext());
+        var character = CharacterFactory.CreateCharacter(_fixture.CreateContext());
         var fetch = _service.GetOne(character.ID).Data!;
 
         Assert.Equivalent(character, fetch);
@@ -78,13 +82,14 @@ public class CharacterServiceTests :DatabaseTestBase
     [Fact]
     public void GetOne_GetCorrectFromMany()
     {
-        CreateCharacters(2);
-        var character = Factory.CreateCharacter(_fixture.CreateContext());
-        CreateCharacters(2);
+        var context = _fixture.CreateContext();
+        var characterNotToGet = CharacterFactory.CreateCharacter(context);
+        var characterToGet = CharacterFactory.CreateCharacter(context);
 
-        var fetch = _service.GetOne(character.ID).Data!;
+        var fetch = _service.GetOne(characterToGet.ID).Data!;
 
-        Assert.Equivalent(character, fetch);
+        Assert.Equivalent(characterToGet, fetch);
+        Assert.Throws<EquivalentException>(()=> Assert.Equivalent(characterNotToGet, fetch));
     }
 
     [Fact]
@@ -92,5 +97,21 @@ public class CharacterServiceTests :DatabaseTestBase
     {
         CreateCharacters(2);
         Assert.Throws<KeyNotFoundException>(()=>_service.GetOne(_faker.Random.Uuid()));
+    }
+
+    [Fact]
+    public void Create_Success()
+    {
+        var request = AutoFaker.Generate<CharacterRequest>();
+        var convertedRequest = request.ConvertModelToDTO<Character>();
+        var character = _service.Create(request).Data!;
+        var ID = character.ID;
+        character.ID = Guid.Empty; // Request doesn't have ID.
+        Assert.Equivalent(convertedRequest, character, strict:false);
+
+        // Check for DB:
+        var fetched = _fixture.CreateContext().Set<Character>().FirstOrDefault(c=>c.ID == ID);
+
+        Assert.Throws<EquivalentException>(()=>Assert.Equivalent(character, fetched));
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.Data.Sqlite;
 using SQLitePCL;
 using Yggdrasil.Models;
 using Microsoft.AspNetCore.Mvc;
+using Yggdrasil.Tests.Factories;
 
 namespace Yggdrasil.Tests.Controllers;
 
@@ -54,7 +55,7 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        return Factory.CreateCharacter(db, world_ID);
+        return CharacterFactory.CreateCharacter(db, world_ID);
     }
 
     // Tests

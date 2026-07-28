@@ -4,6 +4,7 @@ using Yggdrasil.Models;
 using Yggdrasil.Util;
 using Yggdrasil.Data;
 using Yggdrasil.DTO;
+using yggdrasil.Util;
 
 namespace Yggdrasil.Services;
 
@@ -48,13 +49,10 @@ public class WorldService(AppDbContext db)
     /// <returns>World object</returns>
     public ServiceResult<World> Create(WorldRequest request)
     {
-        var world =  new World
-        {
-            Name = request.Name,
-            Description = request.Description,
-            NarratorInstruction = request.NarratorInstruction ?? _db.Set<Yggdrasil.Models.Settings>().First().DefaultPrompt
-        };
-
+        World world = request.ConvertModelToDTO<World>();
+   
+        world.NarratorInstruction ??= _db.Set<Yggdrasil.Models.Settings>().First().DefaultPrompt;
+    
         _db.Set<World>().Add(world);
         _db.SaveChanges();
 

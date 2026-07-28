@@ -26,36 +26,4 @@ public static class Factory
         using var db = fixture.CreateContext();
         return CreateWorld(db, instruction);
     }
-
-    public static Character CreateCharacter(AppDbContext db, Guid? world_ID = null)
-    {
-        Faker faker = new();
-        var character = new Character
-        {
-            Name = faker.Name.FullName(),
-            Description = faker.Lorem.Lines(),
-            Occupation = faker.Lorem.Lines(),
-            NarrativeRole = faker.Lorem.Lines(),
-            Appearance = faker.Lorem.Lines(),
-            Personality = faker.Lorem.Lines(),
-            Gender = faker.Lorem.Lines(),
-            Race = faker.Lorem.Lines(),
-            Equipment = faker.Lorem.Lines(),
-        };
-        // Set up character into the world, and give it the world ID if we passed a world ID
-        if (world_ID != null){ 
-            var world = db.Set<World>().Include(w=>w.Characters).First(w=>w.ID == world_ID);
-            world.Characters.Add(character);
-            character.World_IDs.Add(world_ID.Value);
-        }
-        db.Set<Character>().Add(character);
-        db.SaveChanges();
-        return character;
-    }
-
-    public static Character CreateCharacter(DatabaseFixture fixture, Guid? world_ID = null)
-    {
-        using var db = fixture.CreateContext();
-        return CreateCharacter(db, world_ID);
-    }
 }
