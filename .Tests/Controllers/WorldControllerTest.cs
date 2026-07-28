@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Text.Json;
 using System.Net;
 using Bogus;
-using Yggdrasil.Tests.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Data;
@@ -48,14 +47,14 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        return Factory.CreateWorld(db);
+        return WorldFactory.Create(db);
     }
 
     private Character CreateCharacter(Guid? world_ID=null)
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        return CharacterFactory.CreateCharacter(db, world_ID);
+        return CharacterFactory.Create(db, world_ID);
     }
 
     // Tests

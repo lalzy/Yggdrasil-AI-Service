@@ -1,7 +1,6 @@
 // CharacterFactory.cs
 
 using AutoBogus;
-using Yggdrasil.DTO;
 using Yggdrasil.Models;
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Data;
@@ -9,7 +8,7 @@ using Yggdrasil.Data;
 namespace Yggdrasil.Tests.Factories;
 
 public class CharacterFactory{
-    public static Character CreateCharacter(AppDbContext db, Guid? world_ID = null)
+    public static Character Create(AppDbContext db, Guid? world_ID = null)
     {
         var character = AutoFaker.Generate<Character>();
         
@@ -24,9 +23,9 @@ public class CharacterFactory{
         return character;
     }
 
-    public static Character CreateCharacter(DatabaseFixture fixture, Guid? world_ID = null)
+    public static Character Create(DatabaseFixture fixture, Guid? world_ID = null)
     {
         using var db = fixture.CreateContext();
-        return CreateCharacter(db, world_ID);
+        return Create(db, world_ID);
     }
 }

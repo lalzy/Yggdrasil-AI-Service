@@ -1,7 +1,6 @@
 // CharacterServiceTests.cs
 using Bogus;
 using AutoBogus;
-using Yggdrasil.Tests.Utility;
 using Yggdrasil.Tests.Factories;
 using Yggdrasil.Services;
 using Yggdrasil.Models;
@@ -28,7 +27,7 @@ public class CharacterServiceTests :DatabaseTestBase
         var context = _fixture.CreateContext();
         for(int i = 0; i < count; i++)
         {
-            CharacterFactory.CreateCharacter(context, world_ID);
+            CharacterFactory.Create(context, world_ID);
         }
     }
 
@@ -73,7 +72,7 @@ public class CharacterServiceTests :DatabaseTestBase
     [Fact]
     public void GetOne_GetRequested()
     {
-        var character = CharacterFactory.CreateCharacter(_fixture.CreateContext());
+        var character = CharacterFactory.Create(_fixture.CreateContext());
         var fetch = _service.GetOne(character.ID).Data!;
 
         Assert.Equivalent(character, fetch);
@@ -83,8 +82,8 @@ public class CharacterServiceTests :DatabaseTestBase
     public void GetOne_GetCorrectFromMany()
     {
         var context = _fixture.CreateContext();
-        var characterNotToGet = CharacterFactory.CreateCharacter(context);
-        var characterToGet = CharacterFactory.CreateCharacter(context);
+        var characterNotToGet = CharacterFactory.Create(context);
+        var characterToGet = CharacterFactory.Create(context);
 
         var fetch = _service.GetOne(characterToGet.ID).Data!;
 
