@@ -43,7 +43,8 @@ public class CharacterService(AppDbContext db)
 
     public ServiceResult<bool> Delete(Guid character_ID)
     {
-        _db.Set<Character>().Where(c=>c.ID == character_ID).ExecuteDeleteAsync();
+        var rows = _db.Set<Character>().Where(c=>c.ID == character_ID).ExecuteDelete();
+        if(rows == 0) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
         return new ServiceResult<bool>(true);
     }
 }

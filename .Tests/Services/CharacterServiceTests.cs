@@ -69,6 +69,13 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
+    public void GetAll_EmptyReturnsEmpty(){
+        var fetch = _service.GetAll().Data!;
+
+        Assert.Empty(fetch);
+    }
+
+    [Fact]
     public void GetAll_ThrowsOnInvalidCount()
     {
         CreateCharacters(3);
@@ -98,6 +105,15 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
+    public void GetOne_CorrectReturnType(){
+        var character = CharacterFactory.Create(_fixture);
+
+        var fetch = _service.GetOne(character.ID);
+
+        Assert.IsType<ServiceResult<Character>>(fetch);
+    }
+
+    [Fact]
     public void GetOne_InvalidGuidThrows()
     {
         CreateCharacters(2);
@@ -118,6 +134,14 @@ public class CharacterServiceTests :DatabaseTestBase
         // Check for DB:
         var fetched = _fixture.CreateContext().Set<Character>().FirstOrDefault(c=>c.ID == ID);
         Assert.Equivalent(character, fetched);
+    }
+
+    [Fact]
+    public void Create_ReturnType(){
+        var request = AutoFaker.Generate<CharacterRequest>();
+        var ret = _service.Create(request);
+
+        Assert.IsType<ServiceResult<Character>>(ret);
     }
 
     [Fact]
@@ -148,5 +172,20 @@ public class CharacterServiceTests :DatabaseTestBase
 
         Assert.Null(dbCharacter);
         Assert.Equal(2, totalRemaining);
+    }
+
+    [Fact]
+    public void Delete_CorrectReturn(){
+        
+        Character character = CharacterFactory.Create(_fixture);
+
+        var ret = _service.Delete(character.ID);
+        Assert.IsType<ServiceResult<bool>>(ret);
+        Assert.True(ret.Data!);
+    }
+
+    [Fact]
+    public void Delete_InvalidGuidThrows(){
+        Assert.Throws<KeyNotFoundException>(() => _service.Delete(_faker.Random.Guid()));
     }
 }
