@@ -142,6 +142,11 @@ public class CharacterServiceTests :DatabaseTestBase
         Character character = CharacterFactory.Create(_fixture);
         CreateCharacters(2);
 
-        
+        _service.Delete(character.ID);
+        var dbCharacter = GetCharacterFromDB(character.ID);
+        var totalRemaining = _fixture.CreateContext().Set<Character>().Count();
+
+        Assert.Null(dbCharacter);
+        Assert.Equal(2, totalRemaining);
     }
 }

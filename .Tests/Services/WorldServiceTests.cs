@@ -27,9 +27,9 @@ public class WorldServiceTests : DatabaseTestBase
     }
     // Helpers
 
-    private void CreateWorlds (int count=1)
+    private void CreateWorlds(int count = 1)
     {
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             WorldFactory.Create(_fixture);
         }
@@ -45,7 +45,7 @@ public class WorldServiceTests : DatabaseTestBase
     [Fact]
     public void GetAll_GetAllWorldsMade()
     {
-        int count = _faker.Random.Int(20,30);
+        int count = _faker.Random.Int(20, 30);
         CreateWorlds(count);
         var fetched = _service.GetAll().Data!;
         Assert.Equal(count, fetched.Count);
@@ -63,8 +63,16 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
+    public void GetAll_NoErrorOnOverCount(){
+        int count = 3;
+        CreateWorlds(count);
+        var fetched = _service.GetAll(5).Data!;
+        Assert.Equal(count, fetched.Count);
+    }
+    
+    [Fact]
     public void GetAll_ReturnsCorrectServiceResultType()
-    {
+    {   
         CreateWorlds(3);
         var fetch = _service.GetAll();
 
@@ -75,7 +83,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void GetAll_LessThanOneCountThrows()
     {
         CreateWorlds(3);
-        Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
+        Assert.Throws<ArgumentException>(() => _service.GetAll(-1));
     }
 
     [Fact]
@@ -93,7 +101,7 @@ public class WorldServiceTests : DatabaseTestBase
         var fetch = _service.GetOne(world.ID).Data!;
         Assert.Equivalent(world, fetch);
 
-        var fetched = _fixture.CreateContext().Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world.ID);
+        var fetched = _fixture.CreateContext().Set<World>().Include(w => w.Characters).FirstOrDefault(w => w.ID == world.ID);
         Assert.Equivalent(world, fetched);
     }
 
@@ -118,7 +126,7 @@ public class WorldServiceTests : DatabaseTestBase
     [Fact]
     public void GetOne_InvalidWorldGuidThrows()
     {
-        Assert.Throws<KeyNotFoundException>(()=>_service.GetOne(_faker.Random.Guid()));
+        Assert.Throws<KeyNotFoundException>(() => _service.GetOne(_faker.Random.Guid()));
     }
 
     [Fact]
@@ -130,12 +138,12 @@ public class WorldServiceTests : DatabaseTestBase
         var ID = world.ID;
         world.ID = Guid.Empty;
 
-        Assert.Equivalent(convertedRequest, world, strict:false);
+        Assert.Equivalent(convertedRequest, world, strict: false);
 
         // Check DB
-        var fetched = _fixture.CreateContext().Set<Character>().FirstOrDefault(w=>w.ID == ID);
+        var fetched = _fixture.CreateContext().Set<Character>().FirstOrDefault(w => w.ID == ID);
 
-        Assert.Throws<EquivalentException>(()=>Assert.Equivalent(world, fetched));
+        Assert.Throws<EquivalentException>(() => Assert.Equivalent(world, fetched));
     }
 
     [Fact]
@@ -144,7 +152,7 @@ public class WorldServiceTests : DatabaseTestBase
         var request = AutoFaker.Generate<WorldRequest>();
         request.NarratorInstruction = null;
         var result = _service.Create(request).Data!;
-        
+
         Assert.Equal(Yggdrasil.Models.Settings.NARRATION_PROMPT, result.NarratorInstruction);
     }
 
@@ -179,7 +187,7 @@ public class WorldServiceTests : DatabaseTestBase
         _service.Delete(world_ID);
         var fetch = _service.GetAll().Data!;
         Assert.Equal(2, fetch.Count);
-        Assert.DoesNotContain(fetch, w=>w.world_ID == world_ID);
+        Assert.DoesNotContain(fetch, w => w.world_ID == world_ID);
     }
 
     [Fact]
@@ -240,7 +248,7 @@ public class WorldServiceTests : DatabaseTestBase
     public void Deletes_InvalidGuidThrows()
     {
         CreateWorlds(1);
-        Assert.Throws<KeyNotFoundException>(()=>_service.Delete(_faker.Random.Guid()));
+        Assert.Throws<KeyNotFoundException>(() => _service.Delete(_faker.Random.Guid()));
     }
 
     [Fact]
@@ -248,7 +256,7 @@ public class WorldServiceTests : DatabaseTestBase
     {
         var world = WorldFactory.Create(_fixture);
         var character = CharacterFactory.Create(_fixture);
-        
+
         Assert.Empty(GetCharactersFromDB(world.ID));
         _service.AddCharacter(world.ID, character.ID);
 
@@ -261,8 +269,8 @@ public class WorldServiceTests : DatabaseTestBase
     {
         var world = WorldFactory.Create(_fixture);
         var character = CharacterFactory.Create(_fixture);
-        
-        Enumerable.Range(0,2).Select(_ => _service.AddCharacter(world.ID, character.ID)).ToList();
+
+        Enumerable.Range(0, 2).Select(_ => _service.AddCharacter(world.ID, character.ID)).ToList();
         var characters = GetCharactersFromDB(world.ID);
 
         Assert.Single(characters);
@@ -294,14 +302,14 @@ public class WorldServiceTests : DatabaseTestBase
     public void AddCharacter_InvalidWorldGuidThrows()
     {
         var character = CharacterFactory.Create(_fixture);
-        Assert.Throws<KeyNotFoundException>(()=>_service.AddCharacter(_faker.Random.Guid(), character.ID));
+        Assert.Throws<KeyNotFoundException>(() => _service.AddCharacter(_faker.Random.Guid(), character.ID));
     }
 
     [Fact]
     public void AddCharacter_InvalidCharacterGuidThrows()
     {
         var world = WorldFactory.Create(_fixture);
-        Assert.Throws<KeyNotFoundException>(()=>_service.AddCharacter(world.ID, _faker.Random.Guid()));
+        Assert.Throws<KeyNotFoundException>(() => _service.AddCharacter(world.ID, _faker.Random.Guid()));
     }
 
     [Fact]
@@ -322,7 +330,7 @@ public class WorldServiceTests : DatabaseTestBase
         var world = WorldFactory.Create(context);
         int count = 3;
 
-        var characters = Enumerable.Range(0, count).Select(i=>CharacterFactory.Create(context, world.ID)).ToList();
+        var characters = Enumerable.Range(0, count).Select(i => CharacterFactory.Create(context, world.ID)).ToList();
         Character characterToRemove = characters[_faker.Random.Int(0, count - 1)];
 
         Assert.Equal(GetCharactersFromDB(world.ID).Count, count);
@@ -338,11 +346,11 @@ public class WorldServiceTests : DatabaseTestBase
     {
         var world = WorldFactory.Create(_fixture);
         var character = CharacterFactory.Create(_fixture);
-        
+
         var context = _fixture.CreateContext();
         context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID).Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
         context.SaveChanges();
-        
+
         _service.RemoveCharacter(world.ID, character.ID);
 
         var dbCharacter = _fixture.CreateContext().Set<Character>().Include(c => c.Worlds).FirstOrDefault(c => c.ID == character.ID);
@@ -374,7 +382,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void RemoveCharacter_CorrectReturnType()
+    public void RemoveCharacter_CorrectReturnOnSuccess()
     {
         var world = WorldFactory.Create(_fixture);
         var character = CharacterFactory.Create(_fixture);
@@ -385,6 +393,7 @@ public class WorldServiceTests : DatabaseTestBase
 
         var ret = _service.RemoveCharacter(world.ID, character.ID);
         Assert.IsType<ServiceResult<bool>>(ret);
+        Assert.True(ret.Data);
     }
 
     [Fact]
@@ -393,13 +402,13 @@ public class WorldServiceTests : DatabaseTestBase
         var context = _fixture.CreateContext();
         var world = WorldFactory.Create(context);
         var character = CharacterFactory.Create(context, world.ID);
-        Assert.Throws<KeyNotFoundException>(()=>_service.RemoveCharacter(_faker.Random.Guid(), character.ID));
+        Assert.Throws<KeyNotFoundException>(() => _service.RemoveCharacter(_faker.Random.Guid(), character.ID));
     }
 
     [Fact]
     public void RemoveCharacter_InvalidCharacterGuidThrows()
     {
         var world = WorldFactory.Create(_fixture);
-        Assert.Throws<KeyNotFoundException>(()=>_service.RemoveCharacter(world.ID, _faker.Random.Guid()));
+        Assert.Throws<KeyNotFoundException>(() => _service.RemoveCharacter(world.ID, _faker.Random.Guid()));
     }
 }
