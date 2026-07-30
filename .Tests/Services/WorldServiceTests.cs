@@ -12,6 +12,7 @@ using Yggdrasil.Tests.Factories;
 using yggdrasil.Util;
 using Xunit.Sdk;
 using Yggdrasil.Data;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Yggdrasil.Tests.Services;
 
@@ -46,7 +47,7 @@ public class WorldServiceTests : DatabaseTestBase
     {
         int count = _faker.Random.Int(20,30);
         CreateWorlds(count);
-        var fetched = _service.GetAll().Data;
+        var fetched = _service.GetAll().Data!;
         Assert.Equal(count, fetched.Count);
     }
 
@@ -57,7 +58,7 @@ public class WorldServiceTests : DatabaseTestBase
         int toGet = 3;
         CreateWorlds(count);
 
-        var fetched = _service.GetAll(toGet).Data;
+        var fetched = _service.GetAll(toGet).Data!;
         Assert.Equal(toGet, fetched.Count);
     }
 
@@ -75,6 +76,14 @@ public class WorldServiceTests : DatabaseTestBase
     {
         CreateWorlds(3);
         Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
+    }
+
+    [Fact]
+    public void GetAll_EmptyReturnEmpty()
+    {
+        var world = _service.GetAll().Data!;
+
+        Assert.Empty(world);
     }
 
     [Fact]
@@ -96,6 +105,14 @@ public class WorldServiceTests : DatabaseTestBase
         CreateWorlds(2);
         var fetch = _service.GetOne(world.ID).Data!;
         Assert.Equivalent(world, fetch);
+    }
+
+    [Fact]
+    public void GetOne_CorrectReturnType()
+    {
+        var world = WorldFactory.Create(_fixture);
+        var fetch = _service.GetOne(world.ID);
+        Assert.IsType<ServiceResult<World>>(fetch);
     }
 
     [Fact]
@@ -132,6 +149,14 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
+    public void Creates_CorrectReturnType()
+    {
+        var result = _service.Create(AutoFaker.Generate<WorldRequest>());
+
+        Assert.IsType<ServiceResult<World>>(result);
+    }
+
+    [Fact]
     public void Deletes_DeletesTheWorld()
     {
         var context = _fixture.CreateContext();
@@ -158,12 +183,57 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
+    public void Deletes_OnlyDeletedWorldRemovedFromCharacter()
+    {
+        var worlds = Enumerable.Range(0, 2).Select(_ => WorldFactory.Create(_fixture)).ToList();
+        var character = CharacterFactory.Create(_fixture);
+
+        var context = _fixture.CreateContext();
+        worlds.ForEach(world =>
+        {
+            context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID).Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
+        });
+        context.SaveChanges();
+
+        _service.Delete(worlds[0].ID);
+
+        var dbCharacter = _fixture.CreateContext().Set<Character>().Include(c => c.Worlds).FirstOrDefault(c => c.ID == character.ID);
+        Assert.Contains(dbCharacter.Worlds, w => w.ID == worlds[1].ID);
+        Assert.DoesNotContain(dbCharacter.Worlds, w => w.ID == worlds[0].ID);
+    }
+
+    [Fact]
     public void Deletes_DeletedWorldReturnTrue()
     {
         var world_ID = WorldFactory.Create(_fixture).ID;
 
         var fetch = _service.Delete(world_ID);
         Assert.True(fetch.Data);
+    }
+
+    [Fact]
+    public void Deletes_RemovesWorldReference()
+    {
+        var world_ID = WorldFactory.Create(_fixture).ID;
+        var character = CharacterFactory.Create(_fixture, world_ID);
+
+        var dbWorld = _fixture.CreateContext().Set<World>().Include(w => w.Characters).FirstOrDefault(w => w.ID == world_ID)!;
+        Assert.Contains(dbWorld.Characters, c => c.ID == character.ID);
+
+        _service.Delete(world_ID);
+
+        var dbCharacter = _fixture.CreateContext().Set<Character>().Include(c => c.Worlds).FirstOrDefault(c => c.Worlds.Any(w => w.ID == world_ID));
+        Assert.Null(dbCharacter);
+    }
+
+    [Fact]
+    public void Deletes_CorrectReturnType()
+    {
+        var world_ID = WorldFactory.Create(_fixture).ID;
+
+        var ret = _service.Delete(world_ID);
+
+        Assert.IsType<ServiceResult<bool>>(ret);
     }
 
     [Fact]
@@ -184,6 +254,40 @@ public class WorldServiceTests : DatabaseTestBase
 
         // Verify in DB:
         Assert.NotEmpty(GetCharactersFromDB(world.ID));
+    }
+
+    [Fact]
+    public void AddCharacter_DuplicateNotSaved()
+    {
+        var world = WorldFactory.Create(_fixture);
+        var character = CharacterFactory.Create(_fixture);
+        
+        Enumerable.Range(0,2).Select(_ => _service.AddCharacter(world.ID, character.ID)).ToList();
+        var characters = GetCharactersFromDB(world.ID);
+
+        Assert.Single(characters);
+    }
+
+    [Fact]
+    public void AddCharacter_WorldInCharacter()
+    {
+        var world = WorldFactory.Create(_fixture);
+        var character = CharacterFactory.Create(_fixture);
+
+        _service.AddCharacter(world.ID, character.ID);
+
+        var dbCharacter = _fixture.CreateContext().Set<Character>().Include(c => c.Worlds).FirstOrDefault(c => c.ID == character.ID)!;
+        Assert.Contains(dbCharacter.Worlds, w => w.ID == world.ID);
+    }
+
+    [Fact]
+    public void AddCharacter_CorrectReturnType()
+    {
+        var world = WorldFactory.Create(_fixture);
+        var character = CharacterFactory.Create(_fixture);
+
+        var ret = _service.AddCharacter(world.ID, character.ID);
+        Assert.IsType<ServiceResult<Character>>(ret);
     }
 
     [Fact]
@@ -227,6 +331,60 @@ public class WorldServiceTests : DatabaseTestBase
 
         var dbCharacters = GetCharactersFromDB(world.ID);
         Assert.Equal((count - 1), dbCharacters.Count);
+    }
+
+    [Fact]
+    public void RemoveCharacter_WorldRemovedFromCharacter()
+    {
+        var world = WorldFactory.Create(_fixture);
+        var character = CharacterFactory.Create(_fixture);
+        
+        var context = _fixture.CreateContext();
+        context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID).Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
+        context.SaveChanges();
+        
+        _service.RemoveCharacter(world.ID, character.ID);
+
+        var dbCharacter = _fixture.CreateContext().Set<Character>().Include(c => c.Worlds).FirstOrDefault(c => c.ID == character.ID);
+        Assert.DoesNotContain(dbCharacter.Worlds, w => w.ID == world.ID);
+    }
+
+
+
+    [Fact]
+    public void RemoveCharacter_RemovedFromRequestedWorldOnly()
+    {
+        var worlds = Enumerable.Range(0, 2).Select(_ => WorldFactory.Create(_fixture)).ToList();
+        var character = CharacterFactory.Create(_fixture);
+
+        var context = _fixture.CreateContext();
+        worlds.ForEach(world =>
+        {
+            var w = context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID);
+            var c = context.Set<Character>().First(c => c.ID == character.ID);
+            w.Characters.Add(c);
+        });
+        context.SaveChanges();
+
+        _service.RemoveCharacter(worlds[0].ID, character.ID);
+
+        var dbCharacter = _fixture.CreateContext().Set<Character>().Include(c => c.Worlds).FirstOrDefault(c => c.ID == character.ID);
+        Assert.Contains(dbCharacter.Worlds, w => w.ID == worlds[1].ID);
+        Assert.DoesNotContain(dbCharacter.Worlds, w => w.ID == worlds[0].ID);
+    }
+
+    [Fact]
+    public void RemoveCharacter_CorrectReturnType()
+    {
+        var world = WorldFactory.Create(_fixture);
+        var character = CharacterFactory.Create(_fixture);
+
+        var context = _fixture.CreateContext();
+        context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID).Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
+        context.SaveChanges();
+
+        var ret = _service.RemoveCharacter(world.ID, character.ID);
+        Assert.IsType<ServiceResult<bool>>(ret);
     }
 
     [Fact]

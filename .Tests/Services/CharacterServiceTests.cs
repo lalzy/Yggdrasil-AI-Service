@@ -29,6 +29,12 @@ public class CharacterServiceTests :DatabaseTestBase
         {
             CharacterFactory.Create(context, world_ID);
         }
+    } 
+    
+    private Character? GetCharacterFromDB(Guid characet_ID)
+    {
+        var context = _fixture.CreateContext();
+        return context.Set<Character>().FirstOrDefault(c => c.ID == characet_ID);
     }
 
     [Fact]
@@ -112,5 +118,30 @@ public class CharacterServiceTests :DatabaseTestBase
         // Check for DB:
         var fetched = _fixture.CreateContext().Set<Character>().FirstOrDefault(c=>c.ID == ID);
         Assert.Equivalent(character, fetched);
+    }
+
+    [Fact]
+    public void Delete_DeletesTheCharacter()
+    {
+        Character character = CharacterFactory.Create(_fixture);
+        Character dbCharacter = GetCharacterFromDB(character.ID);
+
+        Assert.Equivalent(
+            character,
+            dbCharacter
+        );
+
+        _service.Delete(character.ID);
+        dbCharacter = GetCharacterFromDB(character.ID);
+        Assert.Null(dbCharacter);
+    }
+
+    [Fact]
+    public void Delete_DeletesOnlySelectCharacter()
+    {
+        Character character = CharacterFactory.Create(_fixture);
+        CreateCharacters(2);
+
+        
     }
 }

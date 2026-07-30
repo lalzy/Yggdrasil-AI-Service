@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Services;
 using Yggdrasil.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -15,7 +16,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddServices();
-builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=app.db",

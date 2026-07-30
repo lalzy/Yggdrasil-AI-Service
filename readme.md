@@ -21,14 +21,14 @@ A Scenario/world based web-app for running themed RP sessions with an LLM with m
 # Requirements:
 - [.net 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-10.0.302-windows-x64-installer)
 - EF Core Tools: ```dotnet tool install --global dotnet-ef```
-- LLM service (OpenAI-compatible API)
+- OpenAI-compatible LLM-Keys (either through something like openrouter, or running your own with llama.cpp)
 
 
 # Initial Setup
 1. clone project (see the shiny green button)
 2. ```cd {intoFolder}```
 3. ```dotnet restore```
-4. [Run service](#run-the-service).
+4. [Run service](#run-the-service) (or [run tests](#tests))
 5. Open browser and go to [http://localhost:5242/](http://localhost:5242/)
 
 # Run The Service

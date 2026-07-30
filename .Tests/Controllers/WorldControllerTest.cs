@@ -147,15 +147,21 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Fact]
-    public async Task AddCharacter_Ok()
-    {
-        var world = CreateWorld();
-        var character = CreateCharacter();
-        
-        var response = await _client.PostAsync($"/api/world/{world.ID}/characters/{character.ID}", null);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
+[Fact]
+public async Task AddCharacter_Ok()
+{
+    var world = CreateWorld();
+    var character = CreateCharacter();
+    
+    var response = await _client.PostAsync($"/api/world/{world.ID}/characters/{character.ID}", null);
+    
+    var body = await response.Content.ReadAsStringAsync();
+    Console.WriteLine("======= START =====");
+    Console.WriteLine(body);
+    Console.WriteLine("======END!");
+    
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+}
 
     [Fact]
     public async Task AddCharacter_WorldNotFound()

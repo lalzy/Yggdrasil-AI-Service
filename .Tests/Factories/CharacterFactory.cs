@@ -11,12 +11,11 @@ public class CharacterFactory{
     public static Character Create(AppDbContext db, Guid? world_ID = null)
     {
         var character = AutoFaker.Generate<Character>();
-        
+        character.Worlds = [];
         // Set up character into the world, and give it the world ID if we passed a world ID
         if (world_ID != null){ 
-            var world = db.Set<World>().Include(w=>w.Characters).First(w=>w.ID == world_ID);
+            var world = db.Set<World>().Include(w => w.Characters).First(w => w.ID == world_ID);
             world.Characters.Add(character);
-            character.World_IDs.Add(world_ID.Value);
         }
         db.Set<Character>().Add(character);
         db.SaveChanges();

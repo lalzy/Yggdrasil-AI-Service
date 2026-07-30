@@ -35,8 +35,9 @@ public class WorldService(AppDbContext db)
     /// <returns>World Object or null with error text.</returns>
     public ServiceResult<World> GetOne(Guid world_ID)
     {
-        var world = _db.Set<World>().Where(w=>w.ID == world_ID).Include(w=>w.Characters).FirstOrDefault();
+        var world = _db.Set<World>().Where(w=>w.ID == world_ID).FirstOrDefault();
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
+    
         return new ServiceResult<World>(world);
     }
 
@@ -67,8 +68,11 @@ public class WorldService(AppDbContext db)
     public ServiceResult<bool> Delete(Guid world_ID)
     {
         var world = _db.Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world_ID);
-        if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
-        world.Characters.Clear();
+        if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
+        // var characters = _db.Set<Character>().Where(c=>c.World_IDs.Contains(world_ID)).ToList();
+
+        // characters.ForEach(c=>c.World_IDs.Remove(world_ID));
+        
         _db.Set<World>().Remove(world);
         _db.SaveChanges();
 
@@ -83,12 +87,12 @@ public class WorldService(AppDbContext db)
     /// <returns>The Character</returns>
     public ServiceResult<Character> AddCharacter(Guid world_ID, Guid character_ID)
     {
-        var world = _db.Set<World>().Where(w => w.ID == world_ID).FirstOrDefault();
+        var world = _db.Set<World>().Include(w=>w.Characters).Where(w => w.ID == world_ID).FirstOrDefault();
         if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
         var character = _db.Set<Character>().Where(c=>c.ID == character_ID).FirstOrDefault();
         if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
-
         world.Characters.Add(character);
+        // character.World_IDs.Add(world_ID);
 
         _db.SaveChanges();
         return new ServiceResult<Character>(character);
@@ -108,6 +112,7 @@ public class WorldService(AppDbContext db)
         if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
         
         world.Characters.Remove(character);
+        // character.World_IDs.Remove(world_ID);
         _db.SaveChanges();
 
         return ServiceResult<bool>.NoContent();

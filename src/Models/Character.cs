@@ -4,7 +4,7 @@ namespace Yggdrasil.Models;
 
 public class Character  : CharacterBase 
 {
-    public List<Guid> World_IDs {get; set;} = [];
+    public List<World> Worlds {get; set;} = [];
     public string? NarrativeRole {get; set;}
     public required string Personality {get; set;}
     public string? ExampleDialogue {get; set;}

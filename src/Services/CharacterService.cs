@@ -40,4 +40,10 @@ public class CharacterService(AppDbContext db)
         _db.SaveChanges();
         return new ServiceResult<Character>(character);
     }
+
+    public ServiceResult<bool> Delete(Guid character_ID)
+    {
+        _db.Set<Character>().Where(c=>c.ID == character_ID).ExecuteDeleteAsync();
+        return new ServiceResult<bool>(true);
+    }
 }
