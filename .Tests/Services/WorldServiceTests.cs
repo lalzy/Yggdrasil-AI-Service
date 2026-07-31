@@ -43,7 +43,7 @@ public class WorldServiceTests : DatabaseTestBase
 
     // Tests
     [Fact]
-    public void GetAll_GetAllWorldsMade()
+    public void GetAll_GetAllMade()
     {
         int count = _faker.Random.Int(20, 30);
         CreateWorlds(count);
@@ -87,7 +87,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_EmptyReturnEmpty()
+    public void GetAll_EmptyReturnsEmpty()
     {
         var world = _service.GetAll().Data!;
 
@@ -106,7 +106,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void GetOne_GetCorrectWorldFromMany()
+    public void GetOne_GetCorrectFromMany()
     {
         CreateWorlds(2);
         var world = WorldFactory.Create(_fixture);
@@ -124,7 +124,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void GetOne_InvalidWorldGuidThrows()
+    public void GetOne_InvalidGuidThrows()
     {
         Assert.Throws<KeyNotFoundException>(() => _service.GetOne(_faker.Random.Guid()));
     }
@@ -178,7 +178,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void Deletes_OnlyRequestedWorldDeletes()
+    public void Deletes_OnlyRequestedDeletes()
     {
         CreateWorlds(1);
         var world_ID = WorldFactory.Create(_fixture).ID;
@@ -211,15 +211,6 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void Deletes_DeletedWorldReturnTrue()
-    {
-        var world_ID = WorldFactory.Create(_fixture).ID;
-
-        var fetch = _service.Delete(world_ID);
-        Assert.True(fetch.Data);
-    }
-
-    [Fact]
     public void Deletes_RemovesWorldReference()
     {
         var world_ID = WorldFactory.Create(_fixture).ID;
@@ -242,6 +233,8 @@ public class WorldServiceTests : DatabaseTestBase
         var ret = _service.Delete(world_ID);
 
         Assert.IsType<ServiceResult<bool>>(ret);
+
+        Assert.True(ret.Data!);
     }
 
     [Fact]

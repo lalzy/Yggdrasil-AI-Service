@@ -8,6 +8,8 @@ using Yggdrasil.DTO;
 using Yggdrasil.Util;
 using yggdrasil.Util;
 using Xunit.Sdk;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Yggdrasil.Tests.Services;
 
@@ -60,6 +62,14 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
+    public void GetAll_NoErrorOnOverCount(){
+        int count = 3;
+        CreateCharacters(count);
+        var fetched = _service.GetAll(5).Data!;
+        Assert.Equal(count, fetched.Count);
+    }
+
+    [Fact]
     public void GetAll_ReturnsCorrectServiceResultType()
     {
         CreateCharacters(3);
@@ -76,7 +86,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_ThrowsOnInvalidCount()
+    public void GetAll_LessThanOneCountThrows()
     {
         CreateCharacters(3);
         Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
@@ -161,7 +171,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void Delete_DeletesOnlySelectCharacter()
+    public void Delete_OnlyRequestedDeletes()
     {
         Character character = CharacterFactory.Create(_fixture);
         CreateCharacters(2);
@@ -175,7 +185,25 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void Delete_CorrectReturn(){
+    public void Deletes_OnlyDeletedCharacterRemovedFromWorld()
+    {
+        var characters = Enumerable.Range(0, 2).Select(_ => CharacterFactory.Create(_fixture)).ToList();
+        var world = WorldFactory.Create(_fixture);
+        var context = _fixture.CreateContext();
+        characters.ForEach(character =>
+        {
+            context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID).Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
+        });
+        context.SaveChanges();
+        _service.Delete(characters[0].ID);
+        var dbWorld = _fixture.CreateContext().Set<World>().Include(w => w.Characters).FirstOrDefault(w => w.ID == world.ID);
+        Assert.Contains(dbWorld.Characters, c => c.ID == characters[1].ID);
+        Assert.DoesNotContain(dbWorld.Characters, c => c.ID == characters[0].ID);
+    }
+
+
+    [Fact]
+    public void Delete_CorrectReturnType(){
         
         Character character = CharacterFactory.Create(_fixture);
 
