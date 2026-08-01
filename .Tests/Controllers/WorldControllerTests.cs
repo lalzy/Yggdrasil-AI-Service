@@ -8,10 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Data;
 using Microsoft.Data.Sqlite;
-using SQLitePCL;
 using Yggdrasil.Models;
-using Microsoft.AspNetCore.Mvc;
 using Yggdrasil.Tests.Factories;
+using Yggdrasil.Tests.Util;
 
 namespace Yggdrasil.Tests.Controllers;
 
@@ -23,38 +22,8 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
 
     public WorldControllerTests(WebApplicationFactory<Program> factory)
     {
-        var connection = new SqliteConnection("Data Source=:memory:");
-        connection.Open();
-
-        _factory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-                if (descriptor != null) services.Remove(descriptor);
-
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlite(connection));
-            });
-        });
-
+        _factory = ControllerUtil.Setup(factory);
         _client = _factory.CreateClient();
-    }
-
-    // Helpers
-    private World CreateWorld()
-    {
-        using var scope = _factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        return WorldFactory.Create(db);
-    }
-
-    private Character CreateCharacter(Guid? world_ID=null)
-    {
-        using var scope = _factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        return CharacterFactory.Create(db, world_ID);
     }
 
     // Tests
@@ -78,7 +47,7 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     [Fact]
     public async Task GetWorld_Ok()
     {
-        var world = CreateWorld();
+        var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.GetAsync($"/api/world/{world.ID}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -135,7 +104,7 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     [Fact]
     public async Task DeleteWorld_Ok()
     {
-        var world = CreateWorld();
+        var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.DeleteAsync($"/api/world/{world.ID}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -150,8 +119,8 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
 [Fact]
 public async Task AddCharacter_Ok()
 {
-    var world = CreateWorld();
-    var character = CreateCharacter();
+    var world = ControllerUtil.CreateWorld(_factory);
+    var character = ControllerUtil.CreateCharacter(_factory);
     
     var response = await _client.PostAsync($"/api/world/{world.ID}/characters/{character.ID}", null);
     
@@ -166,7 +135,7 @@ public async Task AddCharacter_Ok()
     [Fact]
     public async Task AddCharacter_WorldNotFound()
     {
-        var character = CreateCharacter();
+        var character = ControllerUtil.CreateCharacter(_factory);
         var response = await _client.PostAsync($"/api/world/{_faker.Random.Guid()}/characters/{character.ID}", null);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -174,7 +143,7 @@ public async Task AddCharacter_Ok()
     [Fact]
     public async Task AddCharacter_CharacterNotFound()
     {
-        var world = CreateWorld();
+        var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.PostAsync($"/api/world/{world.ID}/characters/{_faker.Random.Guid()}", null);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -182,8 +151,8 @@ public async Task AddCharacter_Ok()
     [Fact]
     public async Task RemoveCharacter_Ok()
     {
-        var world = CreateWorld();
-        var character = CreateCharacter(world.ID);
+        var world = ControllerUtil.CreateWorld(_factory);
+        var character = ControllerUtil.CreateCharacter(_factory, world.ID);
         
         var response = await _client.DeleteAsync($"/api/world/{world.ID}/characters/{character.ID}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -192,7 +161,7 @@ public async Task AddCharacter_Ok()
     [Fact]
     public async Task RemoveCharacter_WorldNotFound()
     {
-        var character = CreateCharacter();
+        var character = ControllerUtil.CreateCharacter(_factory);
         var response = await _client.DeleteAsync($"/api/world/{_faker.Random.Guid()}/characters/{character.ID}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -200,7 +169,7 @@ public async Task AddCharacter_Ok()
     [Fact]
     public async Task RemoveCharacter_CharacterNotFound()
     {
-        var world = CreateWorld();
+        var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.DeleteAsync($"/api/world/{world.ID}/characters/{_faker.Random.Guid()}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
