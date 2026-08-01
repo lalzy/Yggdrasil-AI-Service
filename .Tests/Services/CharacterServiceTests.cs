@@ -192,8 +192,7 @@ public class CharacterServiceTests :DatabaseTestBase
         Character character = CharacterFactory.Create(_fixture);
 
         var ret = _service.Delete(character.ID);
-        Assert.IsType<ServiceResult<bool>>(ret);
-        Assert.True(ret.Data!);
+        Assert.IsType<ServiceResult<Empty>>(ret);
     }
 
     [Fact]

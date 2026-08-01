@@ -51,9 +51,9 @@ public class CharacterService(AppDbContext db)
     ///<param name="character_ID">ID of the character to delete</param>
     ///<returns>ServiceResult with no data</returns>
     ///<exception cref="KeyNotFOundexception">Character not found</exception>
-    public ServiceResult<bool> Delete(Guid character_ID){
+    public ServiceResult<Empty> Delete(Guid character_ID){
         var rows = _db.Set<Character>().Where(c=>c.ID == character_ID).ExecuteDelete();
         if(rows == 0) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
-        return new ServiceResult<bool>(true);
+        return ServiceResult<Empty>.NoContent();
     }
 }

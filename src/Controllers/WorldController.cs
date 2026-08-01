@@ -21,7 +21,7 @@ public class WorldController : ControllerBase{
     public IActionResult GetAll([FromQuery] int? count) => ServiceResultExtensions.SafeExecute(() => _service.GetAll(count));
 
     [HttpGet("{world_ID}")]
-    public IActionResult get(Guid world_ID) => ServiceResultExtensions.SafeExecute(() => _service.GetOne(world_ID));
+    public IActionResult GetOne(Guid world_ID) => ServiceResultExtensions.SafeExecute(() => _service.GetOne(world_ID));
 
     [HttpPost("create")]
     public IActionResult Create([FromBody] WorldRequest request) => ServiceResultExtensions.SafeExecute(() => _service.Create(request));

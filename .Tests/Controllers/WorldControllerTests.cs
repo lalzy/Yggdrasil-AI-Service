@@ -33,6 +33,16 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     }
 
     [Theory]
+    [InlineData("1")]
+    [InlineData("10")]
+    [InlineData("150")]
+    [InlineData(null)]
+    public async Task GetAll_OkOnCount(string count){
+        var response = await _client.GetAsync($"/api/character/all?count={count}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+    
+    [Theory]
     [InlineData("abc")]
     [InlineData("-1")]
     public async Task GetAll_BadCount_ReturnsBadRequest(string count){
@@ -41,20 +51,20 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     }
 
     [Fact]
-    public async Task GetWorld_Ok(){
+    public async Task GetOne_Ok(){
         var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.GetAsync($"/api/world/{world.ID}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetWorld_NotFound(){
+    public async Task GetOne_NotFound(){
         var response = await _client.GetAsync($"/api/world/{_faker.Random.Guid()}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
-    public async Task CreateWorld_Ok(){
+    public async Task Create_Ok(){
         var body = new { name = _faker.Name.FullName(), description= _faker.Lorem.Lines() };
         var content = new StringContent(
             JsonSerializer.Serialize(body),
@@ -66,41 +76,30 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Fact]
-    public async Task CreateWorld_NullName_ReturnsBadRequest(){
-        var body = new { description = _faker.Lorem.Lines() };
+        [Theory]
+    [InlineData("", "desc")]
+    [InlineData("name", "")]
+    public async Task Create_MissingRequiredReturnBadRequest(string name, string description){
+            var body = new { name, description };
         var content = new StringContent(
             JsonSerializer.Serialize(body),
             System.Text.Encoding.UTF8,
             "application/json"
         );
-
         var response = await _client.PostAsync("/api/world/create", content);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Fact]
-    public async Task CreateWorld_NullDescription_ReturnsBadRequest(){
-        var body = new { name = _faker.Name.FullName() };
-        var content = new StringContent(
-            JsonSerializer.Serialize(body),
-            System.Text.Encoding.UTF8,
-            "application/json"
-        );
-
-        var response = await _client.PostAsync("/api/world/create", content);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
 
     [Fact]
-    public async Task DeleteWorld_Ok(){
+    public async Task Delete_Ok(){
         var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.DeleteAsync($"/api/world/{world.ID}");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     [Fact]
-    public async Task DeleteWorld_NotFound(){
+    public async Task Delete_NotFound(){
         var response = await _client.DeleteAsync($"/api/world{_faker.Random.Guid()}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
