@@ -6,23 +6,19 @@ namespace Yggdrasil.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SettingsController : ControllerBase
-{
+public class SettingsController : ControllerBase{
     private readonly SettingsService _service;
-    public SettingsController(SettingsService service)
-    {
+    public SettingsController(SettingsService service){
         _service = service;
     }
     
     [HttpGet("get-theme")]
-    public IActionResult getAll()
-    {
+    public IActionResult getAll(){
         return Ok(_service.getTheme());
     }
 
     [HttpGet("/api/debug/settings")]
-    public IActionResult getAllSettings()
-    {
+    public IActionResult getAllSettings(){
         return Ok(_service.getAll());
     }
 }

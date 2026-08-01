@@ -12,8 +12,7 @@ public class DatabaseFixture : IDisposable
 
     protected readonly DatabaseFixture _fixture;
     
-    public DatabaseFixture()
-    {
+    public DatabaseFixture(){
         Connection = new SqliteConnection("Data Source=:memory:");
         Connection.Open();
 
@@ -27,11 +26,9 @@ public class DatabaseFixture : IDisposable
         db.SaveChanges();
     }
 
-    public void Reset()
-    {
+    public void Reset(){
         using var db = CreateContext();
-        foreach (var entity in db.Model.GetEntityTypes())
-        {
+        foreach (var entity in db.Model.GetEntityTypes()){
             if (entity.ClrType == typeof(Settings)) continue;
             var dbSet = db.Model.FindEntityType(entity.ClrType);
             db.Database.ExecuteSqlRaw($"DELETE FROM \"{entity.GetTableName()}\"");

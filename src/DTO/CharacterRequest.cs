@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Yggdrasil.DTO;
 
-public class CharacterRequest
-{
+public class CharacterRequest{
     [Required]
     [MinLength(1)]
     public required string Name {get; set;}

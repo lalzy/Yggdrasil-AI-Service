@@ -12,12 +12,13 @@ public class CharacterService(AppDbContext db)
 {
     private readonly AppDbContext _db = db;
 
-    public ServiceResult<List<CharacterSummary>> GetAll(int? count=null)
-    {
-        
+    ///<summary>Get a summary list of all characters</summary>
+    ///<param name="count">How many to fetch</param>
+    ///<returns>Service result with a list of character summary objects (name, description)</return>
+    ///<exception cref="ArgumentException">Count is under one</exception>
+    public ServiceResult<List<CharacterSummary>> GetAll(int? count=null){
         var query = _db.Set<Character>().Where<Character>(c=>c.Name != null && c.Description != null).Select(c=> new CharacterSummary(c.ID, c.Name, c.Description));
-        if (count.HasValue)
-        {
+        if (count.HasValue){
             if(count < 1) throw new ArgumentException(ErrorMessages.LESSTHANONE);
             query = query.Take(count.Value);
         }
@@ -25,15 +26,20 @@ public class CharacterService(AppDbContext db)
         return new (query.ToList());
     }
 
-    public ServiceResult<Character> GetOne(Guid character_ID)
-    {
-        var world = _db.Set<Character>().FirstOrDefault(c=>c.ID == character_ID);
-        if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
-        return new (world);
+    ///<summary>Get a specific character</summary>
+    ///<param name="character_ID">The ID of the character to get</param>
+    ///<returns>Service result with the character object as data</return>
+    ///<exception cref="KeyNotfoundexception">Character not found</exception>
+    public ServiceResult<Character> GetOne(Guid character_ID){
+        var character = _db.Set<Character>().FirstOrDefault(c=>c.ID == character_ID);
+        if(character == null) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
+        return new (character);
     }
 
-    public ServiceResult<Character> Create(CharacterRequest request)
-    {
+    ///<summary>Create a character</summary>
+    ///<param name="request">Filled out CharacterRequest object</param>
+    ///<returns>ServiceResult containing character</return>
+    public ServiceResult<Character> Create(CharacterRequest request){
         var character = request.ConvertModelToDTO<Character>();
 
         _db.Set<Character>().Add(character);
@@ -41,8 +47,11 @@ public class CharacterService(AppDbContext db)
         return new ServiceResult<Character>(character);
     }
 
-    public ServiceResult<bool> Delete(Guid character_ID)
-    {
+    ///<summary>Delete a character</summary>
+    ///<param name="character_ID">ID of the character to delete</param>
+    ///<returns>ServiceResult with no data</returns>
+    ///<exception cref="KeyNotFOundexception">Character not found</exception>
+    public ServiceResult<bool> Delete(Guid character_ID){
         var rows = _db.Set<Character>().Where(c=>c.ID == character_ID).ExecuteDelete();
         if(rows == 0) throw new KeyNotFoundException(ErrorMessages.CHARACTER_NOT_EXIST);
         return new ServiceResult<bool>(true);

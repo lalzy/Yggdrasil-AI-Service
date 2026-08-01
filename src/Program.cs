@@ -1,4 +1,5 @@
 // Program.cs
+
 using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Services;
 using Yggdrasil.Data;
@@ -6,10 +7,8 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
-    {
+builder.Services.AddSwaggerGen(c =>{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo{
         Title = "Yggdrasil - AI Scenarios",
         Version = "v1",
     });
@@ -17,8 +16,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddServices();
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
+builder.Services.AddControllers().AddJsonOptions(options =>{
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
@@ -33,12 +31,10 @@ builder.Services.AddRazorPages().AddRazorPagesOptions(options => {
 var app = builder.Build();
 
 // Seed the DB
-using (var scope = app.Services.CreateScope())
-{
+using (var scope = app.Services.CreateScope()){
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
-    if (!db.Set<Yggdrasil.Models.Settings>().Any())
-    {
+    if (!db.Set<Yggdrasil.Models.Settings>().Any()){
         db.Set<Yggdrasil.Models.Settings>().Add(new Yggdrasil.Models.Settings());
         db.SaveChanges();
     }

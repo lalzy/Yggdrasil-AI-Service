@@ -18,30 +18,25 @@ public class CharacterServiceTests :DatabaseTestBase
     private readonly CharacterService _service;
     private readonly Faker _faker = new ();
 
-    public CharacterServiceTests(DatabaseFixture fixture) : base(fixture)
-    {
+    public CharacterServiceTests(DatabaseFixture fixture) : base(fixture){
         _service = new CharacterService(fixture.CreateContext());
     }
 
     // Helpers
-    private void CreateCharacters(int count = 1, Guid? world_ID = null)
-    {
+    private void CreateCharacters(int count = 1, Guid? world_ID = null){
         var context = _fixture.CreateContext();
-        for(int i = 0; i < count; i++)
-        {
+        for(int i = 0; i < count; i++){
             CharacterFactory.Create(context, world_ID);
         }
     } 
     
-    private Character? GetCharacterFromDB(Guid characet_ID)
-    {
+    private Character? GetCharacterFromDB(Guid characet_ID){
         var context = _fixture.CreateContext();
         return context.Set<Character>().FirstOrDefault(c => c.ID == characet_ID);
     }
 
     [Fact]
-    public void GetAll_GetAllMade()
-    {
+    public void GetAll_GetAllMade(){
         int count = _faker.Random.Int(20, 30);
         CreateCharacters(count);
 
@@ -51,8 +46,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_GetOnlyRequestedAmount()
-    {
+    public void GetAll_GetOnlyRequestedAmount(){
         int count = 20;
         int toGet = 5;
         CreateCharacters(count);
@@ -70,8 +64,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_ReturnsCorrectServiceResultType()
-    {
+    public void GetAll_ReturnsCorrectServiceResultType(){
         CreateCharacters(3);
         var fetch = _service.GetAll();
 
@@ -86,15 +79,13 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetAll_LessThanOneCountThrows()
-    {
+    public void GetAll_LessThanOneCountThrows(){
         CreateCharacters(3);
         Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
     }
 
     [Fact]
-    public void GetOne_GetRequested()
-    {
+    public void GetOne_GetRequested(){
         var character = CharacterFactory.Create(_fixture.CreateContext());
         var fetch = _service.GetOne(character.ID).Data!;
 
@@ -102,8 +93,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetOne_GetCorrectFromMany()
-    {
+    public void GetOne_GetCorrectFromMany(){
         var context = _fixture.CreateContext();
         var characterNotToGet = CharacterFactory.Create(context);
         var characterToGet = CharacterFactory.Create(context);
@@ -124,15 +114,13 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void GetOne_InvalidGuidThrows()
-    {
+    public void GetOne_InvalidGuidThrows(){
         CreateCharacters(2);
         Assert.Throws<KeyNotFoundException>(()=>_service.GetOne(_faker.Random.Uuid()));
     }
 
     [Fact]
-    public void Create_Success()
-    {
+    public void Create_Success(){
         var request = AutoFaker.Generate<CharacterRequest>();
         var convertedRequest = request.ConvertModelToDTO<Character>();
         var character = _service.Create(request).Data!;
@@ -155,8 +143,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void Delete_DeletesTheCharacter()
-    {
+    public void Delete_DeletesTheCharacter(){
         Character character = CharacterFactory.Create(_fixture);
         Character dbCharacter = GetCharacterFromDB(character.ID);
 
@@ -171,8 +158,7 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void Delete_OnlyRequestedDeletes()
-    {
+    public void Delete_OnlyRequestedDeletes(){
         Character character = CharacterFactory.Create(_fixture);
         CreateCharacters(2);
 
@@ -185,15 +171,14 @@ public class CharacterServiceTests :DatabaseTestBase
     }
 
     [Fact]
-    public void Deletes_OnlyDeletedCharacterRemovedFromWorld()
-    {
+    public void Deletes_OnlyDeletedCharacterRemovedFromWorld(){
         var characters = Enumerable.Range(0, 2).Select(_ => CharacterFactory.Create(_fixture)).ToList();
         var world = WorldFactory.Create(_fixture);
         var context = _fixture.CreateContext();
-        characters.ForEach(character =>
-        {
-            context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID).Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
+        characters.ForEach(character =>{ context.Set<World>().Include(w => w.Characters).First(w => w.ID == world.ID)
+                                            .Characters.Add(context.Set<Character>().First(c => c.ID == character.ID));
         });
+        
         context.SaveChanges();
         _service.Delete(characters[0].ID);
         var dbWorld = _fixture.CreateContext().Set<World>().Include(w => w.Characters).FirstOrDefault(w => w.ID == world.ID);
@@ -204,7 +189,6 @@ public class CharacterServiceTests :DatabaseTestBase
 
     [Fact]
     public void Delete_CorrectReturnType(){
-        
         Character character = CharacterFactory.Create(_fixture);
 
         var ret = _service.Delete(character.ID);

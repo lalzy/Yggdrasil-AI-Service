@@ -2,10 +2,9 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-public static class ServiceExtensions
-{
-    public static void AddServices(this IServiceCollection services)
-    {
+/// <summary>Register the services automatically that exist in the Yggdrasil.Services namespace</summary>
+public static class ServiceExtensions{
+    public static void AddServices(this IServiceCollection services){
         var serviceTypes = Assembly.GetExecutingAssembly()
         .GetTypes()
         .Where(t => t.IsClass && !t.IsAbstract 
@@ -13,8 +12,7 @@ public static class ServiceExtensions
             && !t.IsSubclassOf(typeof(DbContext))
             && !t.IsNested);
 
-        foreach (var type in serviceTypes)
-        {
+        foreach (var type in serviceTypes){
             services.AddScoped(type);
         }
     }

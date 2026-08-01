@@ -1,4 +1,5 @@
 // WorldController.cs
+
 using Microsoft.AspNetCore.Mvc;
 using Yggdrasil.DTO;
 using Yggdrasil.Models;
@@ -9,12 +10,10 @@ namespace Yggdrasil.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class WorldController : ControllerBase
-{
+public class WorldController : ControllerBase{
     private readonly WorldService _service;
 
-    public WorldController(WorldService service)
-    {
+    public WorldController(WorldService service){
         _service = service;
     }
 

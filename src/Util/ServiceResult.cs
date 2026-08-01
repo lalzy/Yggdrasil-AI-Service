@@ -1,9 +1,9 @@
 // ServiceResult.cs
 namespace Yggdrasil.Util;
 
-public struct Empty {} // Empty Type for noContent
-public record ServiceResult<T>(T? Data, string? Error = null, int StatusCode = 200)
-{
+///<summary>Empty type for noContent</summary>
+public struct Empty {}
+public record ServiceResult<T>(T? Data, string? Error = null, int StatusCode = 200){
     public bool Success => Error == null;
 
     public static ServiceResult<T> Ok(T data) => new(data);

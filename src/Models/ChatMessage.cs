@@ -2,15 +2,13 @@
 
 namespace Yggdrasil.Models;
 
-public enum RoleType
-{
+public enum RoleType{
     system=0,
     assistant=1,
     user=2,
 }
 
-public class ChatMessage
-{
+public class ChatMessage{
     public Guid ID {get; set;}
     public Guid Conversation_ID {get; set;}
     public required RoleType Role {get; set;}

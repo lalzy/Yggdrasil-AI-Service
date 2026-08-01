@@ -3,8 +3,7 @@
 namespace Yggdrasil.Models;
 
 
-public class Conversation
-{
+public class Conversation{
     public Guid ID {get; set;}
     public required Guid World_ID {get; set;}
     public required string Title {get; set;}

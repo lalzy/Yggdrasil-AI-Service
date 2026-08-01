@@ -4,12 +4,11 @@ using Yggdrasil.Models;
 
 namespace Yggdrasil.Data;
 
-public class AppDbContext : DbContext
-{
+public class AppDbContext : DbContext{
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    ///<summary>Register all Models as DB Tables automatically</summary>
+    protected override void OnModelCreating(ModelBuilder modelBuilder){
         var modelTypes = typeof(AppDbContext).Assembly
             .GetTypes()
             .Where(t => t.Namespace == "Yggdrasil.Models" && t.IsClass && !t.IsAbstract);
@@ -17,7 +16,11 @@ public class AppDbContext : DbContext
         foreach (var type in modelTypes)
             modelBuilder.Entity(type);
 
-        // Add this:
+        CreateManyToManyReferences(modelBuilder);
+    }
+
+    ///<summary>Setup many to many references for tables</summary>
+    private  void CreateManyToManyReferences(ModelBuilder modelBuilder){
         modelBuilder.Entity<Character>()
             .HasMany(c => c.Worlds)
             .WithMany(w => w.Characters)

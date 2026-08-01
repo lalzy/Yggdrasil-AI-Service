@@ -2,13 +2,12 @@
 
 namespace Yggdrasil.Models;
 
-public enum Themes
-{
+public enum Themes{
     dark=0,
     light=1,
 }
-public class Settings
-{
+
+public class Settings{
     public const string NARRATION_PROMPT = 
     """
     <rules>

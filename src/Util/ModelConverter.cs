@@ -2,16 +2,15 @@ using System.Reflection;
 
 namespace yggdrasil.Util;
 
-public static class ModelConverter
-{
-    public static T ConvertModelToDTO<T>(this object source)
-    {
+public static class ModelConverter{
+    ///<summary>Load up models automatically</summary>
+    ///<returns>A new <typeparamref name="T"/>with mapped properties</returns>
+    public static T ConvertModelToDTO<T>(this object source){
         var target = (T)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(T));
         var sourceProps = source.GetType().GetProperties();
         var targetProps = typeof(T).GetProperties();
 
-        foreach (var tp in targetProps)
-        {
+        foreach (var tp in targetProps){
             // ensure collections get initialized correctly.
             if (tp.PropertyType.IsGenericType && tp.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
                 tp.SetValue(target, Activator.CreateInstance(tp.PropertyType));

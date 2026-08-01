@@ -2,8 +2,7 @@
 
 namespace Yggdrasil.Models;
 
-public abstract class CharacterBase
-{
+public abstract class CharacterBase{
     public Guid ID {get; set;}
     public required string Name {get; set;}
     public required string Gender {get; set;}

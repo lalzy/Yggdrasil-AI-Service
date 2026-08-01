@@ -2,8 +2,7 @@
 
 namespace Yggdrasil.Models;
 
-public class LorebookEntry
-{
+public class LorebookEntry{
     public Guid ID {get; set;}
     public Guid Lorebook_ID {get; set;}
     public required string Name {get;set;}
