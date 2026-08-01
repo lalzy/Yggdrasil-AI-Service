@@ -106,7 +106,7 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     {
         var world = ControllerUtil.CreateWorld(_factory);
         var response = await _client.DeleteAsync($"/api/world/{world.ID}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     [Fact]
