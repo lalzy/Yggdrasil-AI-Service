@@ -232,9 +232,9 @@ public class WorldServiceTests : DatabaseTestBase
 
         var ret = _service.Delete(world_ID);
 
-        Assert.IsType<ServiceResult<bool>>(ret);
+        Assert.IsType<ServiceResult<Empty>>(ret);
 
-        Assert.True(ret.Data!);
+        Assert.Equal(ret.StatusCode, ServiceResult<Empty>.NoContent().StatusCode);
     }
 
     [Fact]
@@ -385,8 +385,8 @@ public class WorldServiceTests : DatabaseTestBase
         context.SaveChanges();
 
         var ret = _service.RemoveCharacter(world.ID, character.ID);
-        Assert.IsType<ServiceResult<bool>>(ret);
-        Assert.True(ret.Data);
+        Assert.IsType<ServiceResult<Empty>>(ret);
+        Assert.Equal(ret.StatusCode, ServiceResult<Empty>.NoContent().StatusCode);
     }
 
     [Fact]

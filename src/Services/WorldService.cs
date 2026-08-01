@@ -65,7 +65,7 @@ public class WorldService(AppDbContext db)
     /// </summary>
     /// <param name="world_ID"></param>
     /// <returns>Boolean true if successfull, false with error if not</returns>
-    public ServiceResult<bool> Delete(Guid world_ID)
+    public ServiceResult<Empty> Delete(Guid world_ID)
     {
         var world = _db.Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world_ID);
         if(world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
@@ -76,7 +76,7 @@ public class WorldService(AppDbContext db)
         _db.Set<World>().Remove(world);
         _db.SaveChanges();
 
-        return new ServiceResult<bool>(true);
+        return ServiceResult<Empty>.NoContent();
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public class WorldService(AppDbContext db)
     /// <param name="world_ID"></param>
     /// <param name="character_ID"></param>
     /// <returns>True if successfull</returns>
-    public ServiceResult<bool> RemoveCharacter(Guid world_ID, Guid character_ID)
+    public ServiceResult<Empty> RemoveCharacter(Guid world_ID, Guid character_ID)
     {
         var world = _db.Set<World>().Include(w=>w.Characters).FirstOrDefault(w=>w.ID == world_ID);
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
@@ -115,6 +115,6 @@ public class WorldService(AppDbContext db)
         // character.World_IDs.Remove(world_ID);
         _db.SaveChanges();
 
-        return ServiceResult<bool>.NoContent();
+        return ServiceResult<Empty>.NoContent();
     }
 }
