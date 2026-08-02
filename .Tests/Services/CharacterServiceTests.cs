@@ -5,12 +5,10 @@ using Yggdrasil.Services;
 using Yggdrasil.Models;
 using Yggdrasil.DTO;
 using Yggdrasil.Util;
-using yggdrasil.Util;
 
-namespace Yggdrasil.Tests.Services;
+namespace yggdrasil.Tests.Services;
 
-public class CharacterServiceTests :DatabaseTestBase
-{
+public class CharacterServiceTests :DatabaseTestBase{
     private readonly CharacterService _service;
     private readonly Faker _faker = new ();
 

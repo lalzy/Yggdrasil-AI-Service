@@ -1,6 +1,6 @@
 // ModelConverter.cs
 
-namespace yggdrasil.Util;
+namespace Yggdrasil.Util;
 
 public static class ModelConverter{
     ///<summary>Load up models automatically</summary>

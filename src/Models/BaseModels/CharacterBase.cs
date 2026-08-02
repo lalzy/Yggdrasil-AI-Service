@@ -6,6 +6,7 @@ public abstract class CharacterBase{
     public Guid ID {get; set;}
     public required string Name {get; set;}
     public required string Gender {get; set;}
+    public required string Description { get; set; }
     public string? Race {get; set;}
     public string? Occupation {get; set;}
     public string? Appearance {get; set;}

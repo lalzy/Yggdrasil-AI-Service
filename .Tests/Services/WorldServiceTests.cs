@@ -4,7 +4,6 @@ using Yggdrasil.DTO;
 using Yggdrasil.Models;
 using Yggdrasil.Util;
 using Yggdrasil.Tests.Factories;
-using yggdrasil.Util;
 using Yggdrasil.Data;
 
 namespace Yggdrasil.Tests.Services;
