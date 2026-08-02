@@ -17,7 +17,7 @@ public class CharacterService(AppDbContext db)
     ///<returns>Service result with a list of character summary objects (name, description)</return>
     ///<exception cref="ArgumentException">Count is under one</exception>
     public ServiceResult<List<CharacterSummary>> GetAll(int? count=null){
-        var query = _db.Set<Character>().Where<Character>(c=>c.Name != null && c.Description != null).Select(c=> new CharacterSummary(c.ID, c.Name, c.Description));
+        var query = _db.Set<Character>().Where<Character>(c=>c.Name != null && c.Description != null && c.Gender != null).Select(c=> new CharacterSummary(c.ID, c.Name, c.Description, c.Gender));
         if (count.HasValue){
             if(count < 1) throw new ArgumentException(ErrorMessages.LESSTHANONE);
             query = query.Take(count.Value);

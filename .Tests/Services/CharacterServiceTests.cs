@@ -29,9 +29,11 @@ public class CharacterServiceTests :DatabaseTestBase{
         return context.Set<Character>().FirstOrDefault(c => c.ID == characet_ID);
     }
 
-    [Fact]
-    public void GetAll_GetAllMade(){
-        int count = _faker.Random.Int(20, 30);
+    [Theory]
+    [InlineData(5)]
+    [InlineData(30)]
+    [InlineData(150)]
+    public void GetAll_GetAllMade(int count){
         CreateCharacters(count);
 
         var fetch = _service.GetAll().Data!;
@@ -39,11 +41,13 @@ public class CharacterServiceTests :DatabaseTestBase{
         Assert.Equal(count, fetch.Count);
     }
 
-    [Fact]
-    public void GetAll_GetOnlyRequestedAmount(){
-        int count = 20;
+    [Theory]
+    [InlineData(1)]
+    [InlineData(5)]
+    [InlineData(30)]
+    public void GetAll_GetOnlyRequestedAmount(int count){
         int toGet = 5;
-        CreateCharacters(count);
+        CreateCharacters(100);
         var fetch = _service.GetAll(toGet).Data!;
 
         Assert.Equal(toGet, fetch.Count);
