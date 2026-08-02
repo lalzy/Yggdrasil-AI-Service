@@ -24,6 +24,10 @@ public class PersonaTests : DatabaseTestBase{
         }
     }
 
+    private Persona? GetPersonaFromDB(Guid persona_ID){
+        return _fixture.CreateContext().Set<Persona>().FirstOrDefault(p => p.ID == persona_ID);
+    }
+
     // Tests
     [Theory]
     [InlineData(5)]
@@ -132,4 +136,47 @@ public class PersonaTests : DatabaseTestBase{
         Assert.IsType<ServiceResult<Persona>>(ret);
     }
 
+    [Fact]
+    public void Delete_DeletesThePersona(){
+        Persona persona = PersonaFactory.Create(_fixture);
+        Persona dbPersona = GetPersonaFromDB(persona.ID)!;
+
+        Assert.Equivalent(persona, dbPersona);
+
+        _service.Delete(persona.ID);
+        dbPersona = GetPersonaFromDB(persona.ID);
+        Assert.Null(dbPersona);
+    }
+    
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void Delete_OnlyRequestedDeleted(int index){
+        var personas = Enumerable.Range(0, 3).Select(p => PersonaFactory.Create(_fixture)).ToList();
+        var personaToDelete = personas[index];
+
+        _service.Delete(personaToDelete.ID);
+
+        foreach(var persona in personas){
+            var dbFetch = _fixture.CreateContext().Set<Persona>().FirstOrDefault(p => p.ID == persona.ID);
+            if (persona == personaToDelete)
+                Assert.Null(dbFetch);
+            else
+                Assert.Equivalent(persona, dbFetch);
+        }
+    }
+
+    [Fact]
+    public void Delete_CorrectReturnType(){
+        Persona persona = PersonaFactory.Create(_fixture);
+
+        var ret = _service.Delete(persona.ID);
+        Assert.IsType<ServiceResult<Empty>>(ret);
+    }
+
+    [Fact]
+    public void Delete_InvalidGuidThrows(){
+        Assert.Throws<KeyNotFoundException>(() => _service.Delete(_faker.Random.Guid()));
+    }
 }

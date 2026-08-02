@@ -165,16 +165,24 @@ public class WorldServiceTests : DatabaseTestBase
         Assert.Null(dbFetch);
     }
 
-    [Fact]
-    public void Deletes_OnlyRequestedDeletes(){
-        CreateWorlds(1);
-        var world_ID = WorldFactory.Create(_fixture).ID;
-        CreateWorlds(1);
-        Assert.Equal(3, _service.GetAll().Data!.Count);
-        _service.Delete(world_ID);
-        var fetch = _service.GetAll().Data!;
-        Assert.Equal(2, fetch.Count);
-        Assert.DoesNotContain(fetch, w => w.world_ID == world_ID);
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void Delete_OnlyRequestedDeleted(int index){
+        var worlds = Enumerable.Range(0, 3).Select(w => WorldFactory.Create(_fixture)).ToList();
+        var worldToDelete = worlds[index];
+
+        _service.Delete(worldToDelete.ID);
+
+        foreach(var world in worlds){
+            var dbFetch = _fixture.CreateContext().Set<World>().FirstOrDefault(w => w.ID == world.ID);
+
+            if(world == worldToDelete)
+                Assert.Null(dbFetch);
+            else
+                Assert.Equivalent(world, dbFetch);
+        }
     }
 
     [Fact]
@@ -197,7 +205,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void Deletes_RemovesWorldReference(){
+    public void Delete_RemovesWorldReference(){
         var world_ID = WorldFactory.Create(_fixture).ID;
         var character = CharacterFactory.Create(_fixture, world_ID);
 
@@ -211,7 +219,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void Deletes_CorrectReturnType(){
+    public void Delete_CorrectReturnType(){
         var world_ID = WorldFactory.Create(_fixture).ID;
 
         var ret = _service.Delete(world_ID);
@@ -222,7 +230,7 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void Deletes_InvalidGuidThrows(){
+    public void Delete_InvalidGuidThrows(){
         CreateWorlds(1);
         Assert.Throws<KeyNotFoundException>(() => _service.Delete(_faker.Random.Guid()));
     }

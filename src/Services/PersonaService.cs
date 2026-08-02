@@ -23,7 +23,7 @@ public class PersonaService(AppDbContext db){
     }
 
     
-        ///<summary>Get a specific persona</summary>
+    ///<summary>Get a specific persona</summary>
     ///<param name="character_ID">The ID of the persona  to get</param>
     ///<returns>Service result with the persona  object as data</return>
     ///<exception cref="KeyNotfoundexception">Persona not found</exception>
@@ -32,11 +32,25 @@ public class PersonaService(AppDbContext db){
         if(persona == null) throw new KeyNotFoundException(ErrorMessages.PERSONA_NOT_FOUND);
         return new(persona);
     }
-
+    
+    ///<summary>Create a persona</summary>
+    ///<param name="request">Filled out PersonaRequest object</param>
+    ///<returns>ServiceResult containing persona</return>
     public ServiceResult<Persona> Create(PersonaRequest request){
         var persona = request.ConvertModelToDTO<Persona>();
         _db.Set<Persona>().Add(persona);
         _db.SaveChanges();
         return new(persona);
+    }
+    
+    ///<summary>Delete a persona</summary>
+    ///<param name="character_ID">ID of the persona to delete</param>
+    ///<returns>ServiceResult with no data</returns>
+    ///<exception cref="KeyNotFOundexception">persona not found</exception>
+    public ServiceResult<Empty> Delete(Guid persona_ID){
+        var rows = _db.Set<Persona>().Where(p => p.ID == persona_ID).ExecuteDelete();
+        if(rows == 0) throw new KeyNotFoundException(ErrorMessages.PERSONA_NOT_FOUND);
+
+        return ServiceResult<Empty>.NoContent();
     }
 }

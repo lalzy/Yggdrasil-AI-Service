@@ -159,21 +159,27 @@ public class CharacterServiceTests :DatabaseTestBase{
         Assert.Null(dbCharacter);
     }
 
-    [Fact]
-    public void Delete_OnlyRequestedDeletes(){
-        Character character = CharacterFactory.Create(_fixture);
-        CreateCharacters(2);
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void Delete_OnlyRequestedDeleted(int index){
+        var characters = Enumerable.Range(0, 3).Select(p => CharacterFactory.Create(_fixture)).ToList();
+        var personaToDelete = characters[index];
 
-        _service.Delete(character.ID);
-        var dbCharacter = GetCharacterFromDB(character.ID);
-        var totalRemaining = _fixture.CreateContext().Set<Character>().Count();
+        _service.Delete(personaToDelete.ID);
 
-        Assert.Null(dbCharacter);
-        Assert.Equal(2, totalRemaining);
+        foreach(var character in characters){
+            var dbFetch = _fixture.CreateContext().Set<Character>().FirstOrDefault(c => c.ID == character.ID);
+            if (character == personaToDelete)
+                Assert.Null(dbFetch);
+            else
+                Assert.Equivalent(character, dbFetch);
+        }
     }
 
     [Fact]
-    public void Deletes_OnlyDeletedCharacterRemovedFromWorld(){
+    public void Delete_OnlyDeletedCharacterRemovedFromWorld(){
         var characters = Enumerable.Range(0, 2).Select(_ => CharacterFactory.Create(_fixture)).ToList();
         var world = WorldFactory.Create(_fixture);
         var context = _fixture.CreateContext();
@@ -187,7 +193,6 @@ public class CharacterServiceTests :DatabaseTestBase{
         Assert.Contains(dbWorld.Characters, c => c.ID == characters[1].ID);
         Assert.DoesNotContain(dbWorld.Characters, c => c.ID == characters[0].ID);
     }
-
 
     [Fact]
     public void Delete_CorrectReturnType(){
