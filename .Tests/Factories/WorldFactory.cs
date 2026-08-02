@@ -1,6 +1,5 @@
 // CharacterFactory.cs
 
-using AutoBogus;
 using Yggdrasil.Models;
 using Yggdrasil.Data;
 

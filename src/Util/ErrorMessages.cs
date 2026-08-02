@@ -1,4 +1,5 @@
 // ErrorMessages.cs
+
 namespace Yggdrasil.Util;
 
 ///<summary>Collection of static errorMessages for normalized Messages</summary>

@@ -1,7 +1,8 @@
+// CharacterService.cs
+
 using Yggdrasil.Data;
 using Yggdrasil.DTO;
 using Yggdrasil.Util;
-using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Models;
 using yggdrasil.Util;
 

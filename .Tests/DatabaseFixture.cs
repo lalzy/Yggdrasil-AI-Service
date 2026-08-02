@@ -2,8 +2,6 @@
 
 using Yggdrasil.Models;
 using Yggdrasil.Data;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 
 public class DatabaseFixture : IDisposable
 {

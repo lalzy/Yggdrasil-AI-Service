@@ -1,15 +1,11 @@
 // CharacterServiceTests.cs
-using Bogus;
-using AutoBogus;
+
 using Yggdrasil.Tests.Factories;
 using Yggdrasil.Services;
 using Yggdrasil.Models;
 using Yggdrasil.DTO;
 using Yggdrasil.Util;
 using yggdrasil.Util;
-using Xunit.Sdk;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Yggdrasil.Tests.Services;
 

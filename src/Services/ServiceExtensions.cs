@@ -1,6 +1,6 @@
 // ServiceExtensions.cs
+
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 
 /// <summary>Register the services automatically that exist in the Yggdrasil.Services namespace</summary>
 public static class ServiceExtensions{

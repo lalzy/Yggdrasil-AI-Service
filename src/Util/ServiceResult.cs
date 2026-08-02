@@ -1,4 +1,5 @@
 // ServiceResult.cs
+
 namespace Yggdrasil.Util;
 
 ///<summary>Empty type for noContent</summary>

@@ -1,6 +1,5 @@
 // CharacterController.cs
 
-using Microsoft.AspNetCore.Mvc;
 using Yggdrasil.Services;
 using Yggdrasil.Util;
 using Yggdrasil.DTO;

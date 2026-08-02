@@ -1,15 +1,5 @@
 // CharacterControllertests.cs
 
-using Microsoft.AspNetCore.Mvc.Testing;
-using System.Text.Json;
-using System.Net;
-using Bogus;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Yggdrasil.Data;
-using Microsoft.Data.Sqlite;
-using Yggdrasil.Models;
-using Yggdrasil.Tests.Factories;
 using Yggdrasil.Tests.Util;
 
 namespace Yggdrasil.Tests.Controllers;

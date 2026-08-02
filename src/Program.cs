@@ -1,7 +1,5 @@
 // Program.cs
 
-using Microsoft.EntityFrameworkCore;
-using Yggdrasil.Services;
 using Yggdrasil.Data;
 using System.Text.Json.Serialization;
 

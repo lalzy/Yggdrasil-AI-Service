@@ -1,8 +1,6 @@
 // CharacterFactory.cs
 
-using AutoBogus;
 using Yggdrasil.Models;
-using Microsoft.EntityFrameworkCore;
 using Yggdrasil.Data;
 
 namespace Yggdrasil.Tests.Factories;
