@@ -30,22 +30,26 @@ public class WorldServiceTests : DatabaseTestBase
     }
 
     // Tests
-    [Fact]
-    public void GetAll_GetAllMade(){
-        int count = _faker.Random.Int(20, 30);
+    
+    [Theory]
+    [InlineData(5)]
+    [InlineData(30)]
+    [InlineData(150)]
+    public void GetAll_GetAllMade(int count){
         CreateWorlds(count);
         var fetched = _service.GetAll().Data!;
         Assert.Equal(count, fetched.Count);
     }
 
-    [Fact]
-    public void GetAll_GetOnlyRequestedAmount(){
-        int count = 10;
-        int toGet = 3;
-        CreateWorlds(count);
+    [Theory]
+    [InlineData(1)]
+    [InlineData(5)]
+    [InlineData(30)]
+    public void GetAll_GetOnlyRequestedAmount(int count){
+        CreateWorlds(100);
 
-        var fetched = _service.GetAll(toGet).Data!;
-        Assert.Equal(toGet, fetched.Count);
+        var fetched = _service.GetAll(count).Data!;
+        Assert.Equal(count, fetched.Count);
     }
 
     [Fact]
@@ -64,10 +68,12 @@ public class WorldServiceTests : DatabaseTestBase
         Assert.IsType<ServiceResult<List<WorldSummary>>>(fetch);
     }
 
-    [Fact]
-    public void GetAll_LessThanOneCountThrows(){
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void GetAll_LessThanOneCountThrows(int count){
         CreateWorlds(3);
-        Assert.Throws<ArgumentException>(() => _service.GetAll(-1));
+        Assert.Throws<ArgumentException>(() => _service.GetAll(count));
     }
 
     [Fact]
@@ -87,13 +93,20 @@ public class WorldServiceTests : DatabaseTestBase
         Assert.Equivalent(world, fetched);
     }
 
-    [Fact]
-    public void GetOne_GetCorrectFromMany(){
-        CreateWorlds(2);
-        var world = WorldFactory.Create(_fixture);
-        CreateWorlds(2);
-        var fetch = _service.GetOne(world.ID).Data!;
-        Assert.Equivalent(world, fetch);
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void GetOne_GetCorrectFromMany(int index){
+        var worlds = Enumerable.Range(0, 2).Select(w => WorldFactory.Create(_fixture)).ToList();
+
+        var worldToGet = worlds[index];
+        
+        var fetch = _service.GetOne(worldToGet.ID).Data!;
+        Assert.Equivalent(worldToGet, fetch);
+
+        foreach(var other in worlds.Where(w => w != worldToGet)){
+            Assert.Throws<EquivalentException>(() => Assert.Equivalent(other, fetch));
+        }
     }
 
     [Fact]

@@ -21,4 +21,22 @@ public class PersonaService(AppDbContext db){
         }
         return new(query.ToList());
     }
+
+    
+        ///<summary>Get a specific persona</summary>
+    ///<param name="character_ID">The ID of the persona  to get</param>
+    ///<returns>Service result with the persona  object as data</return>
+    ///<exception cref="KeyNotfoundexception">Persona not found</exception>
+    public ServiceResult<Persona> GetOne(Guid persona_ID){
+        var persona = _db.Set<Persona>().FirstOrDefault(p => p.ID == persona_ID);
+        if(persona == null) throw new KeyNotFoundException(ErrorMessages.PERSONA_NOT_FOUND);
+        return new(persona);
+    }
+
+    public ServiceResult<Persona> Create(PersonaRequest request){
+        var persona = request.ConvertModelToDTO<Persona>();
+        _db.Set<Persona>().Add(persona);
+        _db.SaveChanges();
+        return new(persona);
+    }
 }

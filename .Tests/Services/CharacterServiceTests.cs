@@ -46,11 +46,10 @@ public class CharacterServiceTests :DatabaseTestBase{
     [InlineData(5)]
     [InlineData(30)]
     public void GetAll_GetOnlyRequestedAmount(int count){
-        int toGet = 5;
         CreateCharacters(100);
-        var fetch = _service.GetAll(toGet).Data!;
+        var fetch = _service.GetAll(count).Data!;
 
-        Assert.Equal(toGet, fetch.Count);
+        Assert.Equal(count, fetch.Count);
     }
 
     [Fact]
@@ -76,10 +75,12 @@ public class CharacterServiceTests :DatabaseTestBase{
         Assert.Empty(fetch);
     }
 
-    [Fact]
-    public void GetAll_LessThanOneCountThrows(){
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void GetAll_LessThanOneCountThrows(int count){
         CreateCharacters(3);
-        Assert.Throws<ArgumentException>(()=>_service.GetAll(-1));
+        Assert.Throws<ArgumentException>(()=>_service.GetAll(count));
     }
 
     [Fact]
@@ -90,16 +91,19 @@ public class CharacterServiceTests :DatabaseTestBase{
         Assert.Equivalent(character, fetch);
     }
 
-    [Fact]
-    public void GetOne_GetCorrectFromMany(){
-        var context = _fixture.CreateContext();
-        var characterNotToGet = CharacterFactory.Create(context);
-        var characterToGet = CharacterFactory.Create(context);
-
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void GetOne_GetCorrectFromMany(int index){
+        var characters = Enumerable.Range(0, 2).Select(c => CharacterFactory.Create(_fixture)).ToList();
+        var characterToGet = characters[index];
+        
         var fetch = _service.GetOne(characterToGet.ID).Data!;
 
         Assert.Equivalent(characterToGet, fetch);
-        Assert.Throws<EquivalentException>(()=> Assert.Equivalent(characterNotToGet, fetch));
+        foreach(var other in characters.Where(c => c != characterToGet)){
+            Assert.Throws<EquivalentException>(() => Assert.Equivalent(other, fetch));
+        }
     }
 
     [Fact]

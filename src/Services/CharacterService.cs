@@ -44,7 +44,7 @@ public class CharacterService(AppDbContext db)
 
         _db.Set<Character>().Add(character);
         _db.SaveChanges();
-        return new ServiceResult<Character>(character);
+        return new (character);
     }
 
     ///<summary>Delete a character</summary>

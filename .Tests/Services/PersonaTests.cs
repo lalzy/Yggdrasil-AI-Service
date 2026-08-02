@@ -63,9 +63,73 @@ public class PersonaTests : DatabaseTestBase{
         Assert.Empty(fetch);
     }
 
-    [Fact]
-    public void GetAll_LessThanOneCountThrows(){
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void GetAll_LessThanOneCountThrows(int count){
         CreatePersonas(3);
-        Assert.Throws<ArgumentException>(() => _service.GetAll(-1));
+        Assert.Throws<ArgumentException>(() => _service.GetAll(count));
     }
+
+    [Fact]
+    public void GetOne_GetRequested(){
+        var persona = PersonaFactory.Create(_fixture);
+        var fetch = _service.GetOne(persona.ID).Data!;
+
+        Assert.Equivalent(persona, fetch);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void GetOne_GetCorrectFromMany(int index){
+        var personas = Enumerable.Range(0, 3).Select(p => PersonaFactory.Create(_fixture)).ToList();
+        var characterToGet = personas[index];
+        var fetch = _service.GetOne(characterToGet.ID).Data!;
+
+        Assert.Equivalent(characterToGet, fetch);
+
+        foreach(var other in personas.Where(p => p != characterToGet)){
+            Assert.Throws<EquivalentException>(() => Assert.Equivalent(other, fetch));
+        }
+    }
+
+    [Fact]
+    public void GetOne_CorrectReturnType(){
+        var persona = PersonaFactory.Create(_fixture);
+
+        var fetch = _service.GetOne(persona.ID);
+
+        Assert.IsType<ServiceResult<Persona>>(fetch);
+    }
+
+    [Fact]
+    public void GetOne_InvalidGuidThrows(){
+        CreatePersonas(2);
+        Assert.Throws<KeyNotFoundException>(() => _service.GetOne(_faker.Random.Uuid()));
+    }
+
+    [Fact]
+    public void Create_Success(){
+        var request = AutoFaker.Generate<PersonaRequest>();
+        var convertedRequest = request.ConvertModelToDTO<Persona>();
+        var persona = _service.Create(request).Data!;
+        var ID = persona.ID;
+        persona.ID = Guid.Empty; // Request doesn't have ID
+        Assert.Equivalent(convertedRequest, persona, strict: false);
+        
+        persona.ID = ID; // Add Id back for DB check
+        var dbFetched = _fixture.CreateContext().Set<Persona>().FirstOrDefault(p => p.ID == ID);
+        Assert.Equivalent(persona, dbFetched);
+    }
+
+    [Fact]
+    public void Create_ReturnType(){
+        var request = AutoFaker.Generate<PersonaRequest>();
+        var ret = _service.Create(request);
+
+        Assert.IsType<ServiceResult<Persona>>(ret);
+    }
+
 }
