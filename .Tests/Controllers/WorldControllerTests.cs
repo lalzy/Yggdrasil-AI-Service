@@ -93,6 +93,15 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("123")]
+    public async Task Delete_BadRequest(string input){
+        var response = await _client.GetAsync($"/api/world/{input}");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     [Fact]
     public async Task AddCharacter_Ok(){
         var world = ControllerUtil.CreateWorld(_factory);

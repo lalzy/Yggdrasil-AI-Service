@@ -76,4 +76,41 @@ public class PersonaControllerTests : IClassFixture<WebApplicationFactory<Progra
         var response = await _client.PostAsync("/api/persona/create", content);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    
+    [Theory]
+    [InlineData("", "desc",  "gen")]
+    [InlineData("name", "",  "gen")]
+    [InlineData("name", "desc", "")]
+    public async Task Create_MissingRequired(string name, string description, string gender){
+        var body = new { name, description, gender };
+        var content = new StringContent(
+            JsonSerializer.Serialize(body),
+            System.Text.Encoding.UTF8,
+            "application/json"
+        );
+        var response = await _client.PostAsync("/api/persona/create", content);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Delete_OK(){
+        var persona = ControllerUtil.CreatePersona(_factory);
+        var response = await _client.DeleteAsync($"/api/persona/{persona.ID}");
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Delete_NotFound(){
+        var response = await _client.DeleteAsync($"/api/persona/{_faker.Random.Guid()}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("123")]
+    public async Task Delete_BadRequest(string input){
+        var response = await _client.GetAsync($"/api/persona/{input}");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }

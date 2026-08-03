@@ -22,4 +22,7 @@ public class PersonaController : ControllerBase{
 
     [HttpPost("create")]
     public IActionResult Create([FromBody] PersonaRequest request) => ServiceResultExtensions.SafeExecute(() => _service.Create(request));
+
+    [HttpDelete("{persona_ID}")]
+    public IActionResult Delete(Guid persona_ID) => ServiceResultExtensions.SafeExecute(() => _service.Delete(persona_ID));
 }

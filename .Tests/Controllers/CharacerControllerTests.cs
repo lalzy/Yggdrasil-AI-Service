@@ -102,4 +102,13 @@ public class CharacterControllerTests : IClassFixture<WebApplicationFactory<Prog
         var response = await _client.DeleteAsync($"/api/character/{_faker.Random.Guid()}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("123")]
+    public async Task Delete_BadRequest(string input){
+        var response = await _client.GetAsync($"/api/character/{input}");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
