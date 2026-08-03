@@ -29,7 +29,7 @@ public class WorldService(AppDbContext db){
     /// <returns>ServiceResult with the world as Data</returns>
     /// <exception cref="KeyNotFoundexception">Thrown when world not found</exception>
     public ServiceResult<World> GetOne(Guid world_ID){
-        var world = _db.Set<World>().Where(w=>w.ID == world_ID).FirstOrDefault();
+        var world = _db.Set<World>().Include(w=>w.Characters).Where(w=>w.ID == world_ID).FirstOrDefault();
         if (world == null) throw new KeyNotFoundException(ErrorMessages.WORLD_NOT_EXIST);
     
         return new ServiceResult<World>(world);

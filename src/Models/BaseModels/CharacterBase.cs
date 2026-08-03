@@ -7,6 +7,8 @@ public abstract class CharacterBase{
     public required string Name {get; set;}
     public required string Gender {get; set;}
     public required string Description { get; set; }
+    public string? Pronouns { get; set; }
+    public string? FullName { get; set; }
     public string? Race {get; set;}
     public string? Occupation {get; set;}
     public string? Appearance {get; set;}

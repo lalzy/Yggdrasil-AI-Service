@@ -15,6 +15,8 @@ public class PersonaRequest{
     [Required]
     [MinLength(1)]
     public required string Gender { get; set; }
+    public string? Pronouns { get; set; }
+    public string? FullName { get; set; }
     public string? Race { get; set; }
     public string? Apperance { get; set; }
     public string? Equipment { get; set; }

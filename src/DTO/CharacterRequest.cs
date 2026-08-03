@@ -17,6 +17,8 @@ public class CharacterRequest{
     [Required]
     [MinLength(1)]
     public required string Gender {get; set;}
+    public string? Pronouns { get; set; }
+    public string? FullName { get; set; }
     public string? Race {get; set;}
     public string? Occupation {get; set;}
     public string? Appearance {get; set;}
