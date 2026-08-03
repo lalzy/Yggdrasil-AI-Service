@@ -51,4 +51,11 @@ public static class ControllerUtil{
     public static Character CreateCharacter(WebApplicationFactory<Program> factory, Guid? world_ID=null){
         return WithDB(factory, db => CharacterFactory.Create(db, world_ID));
     }
+
+    /// <summary>Create a procedural-filled persona in the database</summary>
+    /// <param name="factory">The mock webserver context</param>
+    /// <returns>The persona object</returns>
+    public static Persona CreatePersona(WebApplicationFactory<Program> factory){
+        return WithDB(factory, db => PersonaFactory.Create(db));
+    }
 }

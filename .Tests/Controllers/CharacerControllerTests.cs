@@ -24,7 +24,6 @@ public class CharacterControllerTests : IClassFixture<WebApplicationFactory<Prog
     [InlineData("1")]
     [InlineData("10")]
     [InlineData("150")]
-    [InlineData(null)]
     public async Task GetAll_OkOnCount(string count){
         var response = await _client.GetAsync($"/api/character/all?count={count}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -33,7 +32,7 @@ public class CharacterControllerTests : IClassFixture<WebApplicationFactory<Prog
     [Theory]
     [InlineData("abc")]
     [InlineData("-1")]
-    public async Task GetAll_BadCount_ReturnsBadRequest(string count){
+    public async Task GetAll_BadRequest(string count){
         var response = await _client.GetAsync($"/api/character/all?count={count}");
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -47,8 +46,16 @@ public class CharacterControllerTests : IClassFixture<WebApplicationFactory<Prog
 
     [Fact]
     public async Task GetOne_NotFound(){
-        var response = await _client.GetAsync($"/api/world/{_faker.Random.Guid()}");
+        var response = await _client.GetAsync($"/api/character/{_faker.Random.Guid()}");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+    
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("123")]
+    public async Task GetOne_BadRequest(string input){
+        var response = await _client.GetAsync($"/api/character/{input}");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]

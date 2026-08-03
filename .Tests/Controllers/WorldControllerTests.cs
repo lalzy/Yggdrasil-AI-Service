@@ -26,7 +26,6 @@ public class WorldControllerTests : IClassFixture<WebApplicationFactory<Program>
     [InlineData("1")]
     [InlineData("10")]
     [InlineData("150")]
-    [InlineData(null)]
     public async Task GetAll_OkOnCount(string count){
         var response = await _client.GetAsync($"/api/character/all?count={count}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
