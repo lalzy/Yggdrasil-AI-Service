@@ -62,10 +62,4 @@ public class LLMService(AppDbContext db){
 
         return payload;
     }
-    
-    public ServiceResult<object> GetPromptString(Guid world_ID, Guid persona_ID){
-        WorldService worldService = new(db);
-        PersonaService personaService = new(db);
-        return new(createLLMPayload(worldService.GetOne(world_ID).Data!, personaService.GetOne(persona_ID).Data!));
-    }
 }

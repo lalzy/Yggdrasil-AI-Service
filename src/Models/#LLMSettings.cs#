@@ -1,0 +1,9 @@
+// LLMSettings.cs
+
+namespace Yggdrasil.Models;
+
+public class LLMSettings
+{
+    public string? model;
+    public string? 
+}
