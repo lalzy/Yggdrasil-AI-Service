@@ -7,6 +7,7 @@ public class World{
     public Guid? Lorebook_ID {get; set;}
     public required string Name {get; set;}
     public required string Description {get; set;}
+    public string? IntroMessage { get; set; }
     public string? NarratorInstruction {get; set;}
     public string? Scenario { get; set; }
     public List<Character> Characters {get; set;} = [];

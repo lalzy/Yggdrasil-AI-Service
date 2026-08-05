@@ -6,7 +6,7 @@ using Yggdrasil.Models;
 using Yggdrasil.DTO;
 using Yggdrasil.Util;
 
-namespace yggdrasil.Tests.Services;
+namespace Yggdrasil.Tests.Services;
 
 public class CharacterServiceTests :DatabaseTestBase{
     private readonly CharacterService _service;

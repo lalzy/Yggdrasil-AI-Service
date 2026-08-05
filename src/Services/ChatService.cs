@@ -24,10 +24,10 @@ public class ChatService
 
         var body = ObjectMerger.Merge([payload, connection]);
         body["reasoning"] = JsonSerializer.SerializeToElement(new { enabled = connection.Reasoning });
-
+        body.Remove("name");
         var json = JsonSerializer.Serialize(body, new JsonSerializerOptions{PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+        return new(json);
         var response = await client.PostAsync(connection.URL, content);
         var result = await response.Content.ReadAsStringAsync();
 

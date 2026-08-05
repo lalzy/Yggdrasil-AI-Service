@@ -34,32 +34,35 @@ public class LLMService(AppDbContext db){
         return string.Concat(CreateBaseCharacterString(character), "\n", string.Join("\n", lines.Where(l => l != null)));
     }
 
-    private string CreateSystemPrompt(World world, Persona persona){
-        var userElement = new XElement("user", new XText("\n"+CreateBaseCharacterString(persona)));
+    private string CreateSystemPrompt(World world, Persona persona)
+    {
+        var userElement = new XElement("user", new XText("\n" + CreateBaseCharacterString(persona)));
         userElement.Add(new XAttribute(XNamespace.None + "name", persona.Name));
         var charactersElement = new XElement("characters");
 
+        // Create <char name="name"> for each character
+        // wrapped in <characters> tag
         charactersElement.Add(world.Characters.Select(c =>
         {
-            var characterElement = new XElement("char", new XText("\n"+createCharacterString(c)));
+            var characterElement = new XElement("char", new XText("\n" + createCharacterString(c)));
             characterElement.Add(new XAttribute(XNamespace.None + "name", c.Name));
             return characterElement;
         }));
 
         var prompt = new XDocument(
-            new XElement("system", XElement.Parse(world.NarratorInstruction!),
-                new XElement("world", 
+            new XElement("system", new XElement("instruction", world.NarratorInstruction!),
+                new XElement("world",
                     new XElement("scenario", world.Scenario),
                         userElement, charactersElement)));
-
         return prompt.ToString(SaveOptions.None);
     }
 
-    private object createLLMPayload(World world, Persona persona){
+    public ServiceResult<LLMPayload> CreateLLMPayload(World world, Persona persona, List<Message>? messages = null){
         var payload = new LLMPayload();
 
-        payload.Messages.Add(new Message { Role = "system", Content = CreateSystemPrompt(world, persona) });
-
-        return payload;
+        payload.Messages!.Add(new Message { Role = "system", Content = CreateSystemPrompt(world, persona) });
+        // if (world.IntroMessage != null) { payload.Messages.Append(new Message { Role = "user", Content = "" }); }
+        if (messages != null) messages.ForEach(m => payload.Messages.Append(m));
+        return new(payload);
     }
 }
