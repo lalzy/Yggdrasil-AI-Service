@@ -1,5 +1,5 @@
 // ServiceExtensions.cs
-
+using Yggdrasil.Services;
 using System.Reflection;
 
 /// <summary>Register the services automatically that exist in the Yggdrasil.Services namespace</summary>
@@ -13,7 +13,8 @@ public static class ServiceExtensions{
             && !t.IsNested);
 
         foreach (var type in serviceTypes){
-            services.AddScoped(type);
+            if(type == typeof(ChatService)) services.AddHttpClient<ChatService>();
+            else services.AddScoped(type);
         }
     }
 }
