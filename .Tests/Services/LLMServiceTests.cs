@@ -169,5 +169,21 @@ public class LLMServiceTests : DatabaseTestBase{
                 $"<char> for '{character.Name}' is missing the name attribute");
 
     }
+
+    [Fact]
+    public void CreateLLMPayload_WorldInformationAddedINSystemMessage(){
+        var (world, character, persona) = CreateData();
+
+        var payload = _service.CreateLLMPayload(world, persona).Data!;
+        var systemMessage = XDocument.Parse(payload.Messages![0].Content);
+
+        var skip = new[] { "ID", "Name", "CreatedAt", "UpdatedAt", "Description" };
+        var properties = typeof(Persona).GetProperties().Where(p => !skip.Contains(p.Name)).ToList();
+
+        assertProperties(typeof(Persona).GetProperties().Where(p => !skip.Contains(p.Name)).ToList(), persona, skip, XDocument.Parse(payload.Messages[0]!.Content), "world");
+        
+        Assert.True(systemMessage.Descendants("user").Any(element => element.Attribute("name")?.Value == persona.Name),
+                $"<char> for '{character.Name}' is missing the name attribute");
+    }
 }
 
