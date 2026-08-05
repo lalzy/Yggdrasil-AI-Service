@@ -28,7 +28,8 @@ public class LLMService(AppDbContext db){
 
     private string createCharacterString(Character character){
         var lines = new[]{
-            (character.Personality != null ? $"Pronouns: {character.Personality}" : null),
+            (character.Personality != null ? $"Personality: {character.Personality}" : null),
+            (character.Personality != null ? $"NarrativeRole: {character.NarrativeRole}" : null),
         };
         
         return string.Concat(CreateBaseCharacterString(character), "\n", string.Join("\n", lines.Where(l => l != null)));
@@ -46,6 +47,15 @@ public class LLMService(AppDbContext db){
         {
             var characterElement = new XElement("char", new XText("\n" + createCharacterString(c)));
             characterElement.Add(new XAttribute(XNamespace.None + "name", c.Name));
+
+            if(c.ExampleDialogue != null){
+                var exampleDialogueElement = new XElement("example-dialogue");
+                foreach(var line in c.ExampleDialogue){
+                    exampleDialogueElement.Add(new XElement("line", line));
+                }
+            characterElement.Add(exampleDialogueElement);
+        }
+            
             return characterElement;
         }));
 
