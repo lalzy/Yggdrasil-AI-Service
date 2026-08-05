@@ -1,5 +1,6 @@
 // LLMServiceTests.cs
 
+using System.Reflection;
 using Yggdrasil.Tests.Factories;
 using Yggdrasil.Services;
 using System.Xml.Linq;
@@ -20,7 +21,6 @@ public class LLMServiceTests : DatabaseTestBase{
     }
 
     // Helpers
-
     private (World, Character, Persona) CreateData(){
         var world = WorldFactory.Create(_fixture);
         var character = CharacterFactory.Create(_fixture, world.ID);
@@ -37,7 +37,18 @@ public class LLMServiceTests : DatabaseTestBase{
         }
     }
 
+    /// <summary>Helper to test that the system message (which is XML formated) indeed does conain the data expected </summary>
+    private void assertProperties<T>(List<PropertyInfo> properties, T model, string[] skip, XDocument systemMessage, string tag){
+        foreach (var property in properties){
+            bool found = systemMessage.Descendants(tag).ToList().Any(element =>
+            {
+                return element.Value.Contains($"{property.GetValue(model)}");
+            });
+            Assert.True(found, $"Property '{property.Name}' not found in any {tag} element");
+        }
+    }
 
+    
     // Tests
 
     [Fact]
@@ -49,70 +60,114 @@ public class LLMServiceTests : DatabaseTestBase{
     }
 
     [Fact]
-    public void CreateLLMPayload_AlwaysCreateSystemMessageAsDefault(){
-        var (world, character, persona) = CreateData();
-        var payload = _service.CreateLLMPayload(world, persona).Data;
-        world.IntroMessage = null;
-
-        Assert.Single(payload.Messages);
-        Assert.Equal("system", payload.Messages[0].Role);
-        
-    }
-
-    [Fact]
-    public void CreateLLMPayload_AlwaysSystemAndEmptyUserOnNoIntroMessage(){
+    public void CreateLLMPayload_AlwaysSystemAndEmptyUserOnIntroMessage(){
         var (world, character, persona) = CreateData();
         var payload = _service.CreateLLMPayload(world, persona).Data!;
 
         Assert.Equal(2, payload.Messages!.Count);
         Assert.Equal("system", payload.Messages[0].Role);
         Assert.Equal("user", payload.Messages[1].Role);
+        Assert.Equal("", payload.Messages[1].Content);
     }
+
 
     [Theory]
     [InlineData(null)]
-    [InlineData("Some string")]
-    public void CreateLLMPayload_MessagesAdded(string? intro){
+    // [InlineData("Some string")]
+    public void CreateLLMPayload_VerifyIntroMessage(string? intro){
         var (world, character, persona) = CreateData();
         world.IntroMessage = intro;
-        string content = _faker.Lorem.Lines();
-        var message = new Message{Role="user", Content=content};
-        var payload = _service.CreateLLMPayload(world, persona, [message]).Data!;
+        var payload = _service.CreateLLMPayload(world, persona).Data!;
         
         // If no intro-message then first non-system message will be from the user.
-        if(intro == null)
-            Assert.Equivalent(message, payload.Messages![1]);
-        else
-            Assert.Equivalent(message, payload.Messages![3]);
+        if(intro == null){
+            Assert.Equal(1, payload.Messages!.Count);
+        }
+        else{
+            Assert.Equal("", payload.Messages[1].Content);
+            Assert.Equal("user", payload.Messages[1].Role);
+            Assert.Equal(intro, payload.Messages![2].Content);
+            Assert.Equal("assistant", payload.Messages![2].Role);
+            Assert.Equal(3, payload.Messages.Count);
+        }
     }
 
     [Theory]
     [InlineData(1)]
     [InlineData(3)]
     [InlineData(5)]
-    public void CreateLLMPayload_CharactersInSystemMessage(int characterCount){
+    public void CreateLLMPayload_InjectMessages(int messageCount){
+        var (world, character, persona) = CreateData();
+        bool assistant = true;
+        List<Message> messages = Enumerable.Range(0, messageCount).Select(m => {
+            var message = new Message
+            {
+                Content = _faker.Lorem.Lines(),
+                Role = assistant ?  "assistant" : "user"
+            };
+            assistant = !assistant;
+
+            return message;
+        }).ToList();
+
+        var payloadMessages = _service.CreateLLMPayload(world, persona, messages).Data!.Messages!;
+
+        Assert.Equal(messageCount + 3, payloadMessages.Count);
+    }
+
+        
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(5)]
+    public void CreateLLMPayload_CharactersInformationInSystemMessage(int characterCount){
         World world = WorldFactory.Create(_fixture);
         Persona persona = PersonaFactory.Create(_fixture);
         List<Character> characters = Enumerable.Range(0, characterCount).Select(c => CharacterFactory.Create(_fixture, world.ID)).ToList();
         world.Characters = characters;
 
         var payload = _service.CreateLLMPayload(world, persona).Data!;
-        var systemMessage = XDocument.Parse(payload.Messages[0].Content);
+        var systemMessage = XDocument.Parse(payload.Messages![0].Content);
         
-        var skip = new[]{ "Worlds","CreatedAt","UpdatedAt","Description","Name","ID" }; // Doesn't exist in the XML by intent
-        var properties = typeof(Character).GetProperties().Where(p => !skip.Contains(p.Name)).ToList();
-
+        string[] skip = {
+            // Doesn't exist in the XML by intent 
+            "ID", "Worlds","CreatedAt","UpdatedAt","Description","Name","ID", 
+            // NEed to check it manually.
+            "ExampleDialogue" 
+        };
+        
         // Check that the character data does indeed exist as XML Entry
         foreach(var character in characters){
-            foreach(var property in properties){
-                bool found = systemMessage.Descendants("char").ToList().Any(element => {
-                    if(property.Name == "ExampleDialogue")
-                        return character.ExampleDialogue!.All(line => element.Value.Contains(line));
-                    return element.Value.Contains($"{property.GetValue(character)}");
-                });
-                Assert.True(found, $"Property '{property.Name}' not found in any <char> element");
-            }
+
+            // Verify the <char> tag contain the name property
+            Assert.True(systemMessage.Descendants("char").Any(element => element.Attribute("name")?.Value == character.Name),
+                    $"<char> for '{character.Name}' is missing the name attribute");
+
+
+            assertProperties(typeof(Character).GetProperties().Where(p => !skip.Contains(p.Name)).ToList(), character, skip, XDocument.Parse(payload.Messages[0].Content), "char");
+
+            bool found = systemMessage.Descendants("char").Any(element => character.ExampleDialogue!.All(line => element.Value.Contains(line)));
+            Assert.True(found, "ExampleDialogue not found in <char> element");
         }
+    }
+
+    [Fact]
+    public void CreateLLMPayload_PersonaInformationAddedInSystemMessage(){
+        var (world, character, persona) = CreateData();
+
+        var payload = _service.CreateLLMPayload(world, persona).Data!;
+        var systemMessage = XDocument.Parse(payload.Messages![0].Content);
+
+        var skip = new[] { "ID", "Name", "CreatedAt", "UpdatedAt", "Description" };
+        var properties = typeof(Persona).GetProperties().Where(p => !skip.Contains(p.Name)).ToList();
+
+        assertProperties(typeof(Persona).GetProperties().Where(p => !skip.Contains(p.Name)).ToList(), persona, skip, XDocument.Parse(payload.Messages[0]!.Content), "user");
+
+        // Verify the <user> tag contain the user's name property.
+        Assert.True(systemMessage.Descendants("user").Any(element => element.Attribute("name")?.Value == persona.Name),
+                $"<char> for '{character.Name}' is missing the name attribute");
+
     }
 }
 
