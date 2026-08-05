@@ -28,7 +28,8 @@ public class LLMService(AppDbContext db){
 
     private string createCharacterString(Character character){
         var lines = new[]{
-            (character.Personality != null ? $"Pronouns: {character.Personality}" : null),
+            (character.Personality != null ? $"Personality: {character.Personality}" : null),
+            (character.Personality != null ? $"NarrativeRole: {character.NarrativeRole}" : null)
         };
         
         return string.Concat(CreateBaseCharacterString(character), "\n", string.Join("\n", lines.Where(l => l != null)));
@@ -44,8 +45,16 @@ public class LLMService(AppDbContext db){
         // wrapped in <characters> tag
         charactersElement.Add(world.Characters.Select(c =>
         {
-            var characterElement = new XElement("char", new XText("\n" + createCharacterString(c)));
+            var characterElement = new XElement("char", new XText("\n" + createCharacterString(c) + "\n"));
             characterElement.Add(new XAttribute(XNamespace.None + "name", c.Name));
+            
+            if(c.ExampleDialogue != null){
+                var dialogueElement = new XElement("Dialogue-Examples");
+                foreach(var example in c.ExampleDialogue){
+                    dialogueElement.Add(new XText("\nExample: " + example));
+                }
+                    characterElement.Add(dialogueElement);
+            }
             return characterElement;
         }));
 
@@ -61,8 +70,11 @@ public class LLMService(AppDbContext db){
         var payload = new LLMPayload();
 
         payload.Messages!.Add(new Message { Role = "system", Content = CreateSystemPrompt(world, persona) });
-        // if (world.IntroMessage != null) { payload.Messages.Append(new Message { Role = "user", Content = "" }); }
-        if (messages != null) messages.ForEach(m => payload.Messages.Append(m));
+        if (world.IntroMessage != null) {
+            payload.Messages.Add(new Message { Role = "user", Content = "" });
+            payload.Messages.Add(new Message { Role = "assistant", Content = world.IntroMessage });
+        }
+        if (messages != null) messages.ForEach(m => payload.Messages.Add(m));
         return new(payload);
     }
 }
