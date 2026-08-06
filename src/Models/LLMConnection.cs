@@ -9,6 +9,11 @@ public enum APIType
     chatCompletion = 0
 }
 
+public enum SupportedProviders{
+    LLamaCPP = 0,
+    OpenRouter = 1,
+}
+
 public class LLMConnection
 {
     [JsonIgnore]
@@ -19,4 +24,5 @@ public class LLMConnection
     public string? Model  { get; set; }
     public required APIType APIType  { get; set; }
     public bool Reasoning  { get; set; }
+    public required SupportedProviders Provider {get; set;}
 }

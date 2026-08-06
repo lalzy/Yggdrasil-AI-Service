@@ -73,7 +73,7 @@ public class LLMServiceTests : DatabaseTestBase{
 
     [Theory]
     [InlineData(null)]
-    // [InlineData("Some string")]
+    [InlineData("Some string")]
     public void CreateLLMPayload_VerifyIntroMessage(string? intro){
         var (world, character, persona) = CreateData();
         world.IntroMessage = intro;

@@ -4,7 +4,8 @@ using Yggdrasil.Tests.Util;
 using Yggdrasil.Services;
 using Yggdrasil.DTO;
 using Yggdrasil.Models;
-
+using Yggdrasil.Tests.Factories;
+using Yggdrasil.Constants;
 
 namespace Yggdrasil.Tests.Services;
 
@@ -33,8 +34,8 @@ public class ChatServiceTests : DatabaseTestBase{
             
         }, new JsonSerializerOptions{PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
-        var connection = new LLMConnection {Name= "someConnection",APIType = APIType.chatCompletion, APIKey = _faker.Random.Guid().ToString(), URL = _faker.Internet.Url(), Reasoning = false };
-        var payload = new LLMPayload();
+        var connection = LLMConnectionFactory.Create(_fixture);
+        var payload = LLMPayloadFactory.Create();
 
         var result = await _service.Send(connection, payload);
 
