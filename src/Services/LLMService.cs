@@ -5,7 +5,7 @@ using Yggdrasil.Data;
 using Yggdrasil.DTO;
 using Yggdrasil.Util;
 using Yggdrasil.Models;
-
+using Yggdrasil.Constants;
 
 namespace Yggdrasil.Services;
 
@@ -70,10 +70,10 @@ public class LLMService(AppDbContext db){
     public ServiceResult<LLMPayload> CreateLLMPayload(World world, Persona persona, List<Message>? messages = null){
         var payload = new LLMPayload();
 
-        payload.Messages!.Add(new Message { Role = "system", Content = CreateSystemPrompt(world, persona) });
+        payload.Messages!.Add(new Message { Role = LLMRoles.System, Content = CreateSystemPrompt(world, persona) });
         if (world.IntroMessage != null) {
-            payload.Messages.Add(new Message { Role = "user", Content = "" });
-            payload.Messages.Add(new Message { Role = "assistant", Content = world.IntroMessage });
+            payload.Messages.Add(new Message { Role = LLMRoles.User, Content = "" });
+            payload.Messages.Add(new Message { Role = LLMRoles.Assistant, Content = world.IntroMessage });
         }
         if (messages != null) messages.ForEach(m => payload.Messages.Add(m));
         return new(payload);

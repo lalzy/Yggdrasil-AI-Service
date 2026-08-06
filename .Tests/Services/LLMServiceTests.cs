@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Yggdrasil.DTO;
 using Yggdrasil.Models;
 using Yggdrasil.Util;
+using Yggdrasil.Constants;
 
 using Xunit.Abstractions;
 
@@ -64,9 +65,9 @@ public class LLMServiceTests : DatabaseTestBase{
         var (world, character, persona) = CreateData();
         var payload = _service.CreateLLMPayload(world, persona).Data!;
 
-        Assert.Equal(2, payload.Messages!.Count);
-        Assert.Equal("system", payload.Messages[0].Role);
-        Assert.Equal("user", payload.Messages[1].Role);
+        Assert.Equal(3, payload.Messages!.Count);
+        Assert.Equal(LLMRoles.System, payload.Messages[0].Role);
+        Assert.Equal(LLMRoles.User, payload.Messages[1].Role);
         Assert.Equal("", payload.Messages[1].Content);
     }
 
@@ -85,9 +86,9 @@ public class LLMServiceTests : DatabaseTestBase{
         }
         else{
             Assert.Equal("", payload.Messages[1].Content);
-            Assert.Equal("user", payload.Messages[1].Role);
+            Assert.Equal(LLMRoles.User, payload.Messages[1].Role);
             Assert.Equal(intro, payload.Messages![2].Content);
-            Assert.Equal("assistant", payload.Messages![2].Role);
+            Assert.Equal(LLMRoles.Assistant, payload.Messages![2].Role);
             Assert.Equal(3, payload.Messages.Count);
         }
     }
@@ -103,7 +104,7 @@ public class LLMServiceTests : DatabaseTestBase{
             var message = new Message
             {
                 Content = _faker.Lorem.Lines(),
-                Role = assistant ?  "assistant" : "user"
+                Role = assistant ?  LLMRoles.Assistant : LLMRoles.User
             };
             assistant = !assistant;
 

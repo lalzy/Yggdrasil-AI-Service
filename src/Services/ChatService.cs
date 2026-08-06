@@ -69,6 +69,5 @@ public class ChatService
             default:
                 return ServiceResult<LLMResponse>.BadRequest("Unsupported Provider");
         }
-        
     }
 }
