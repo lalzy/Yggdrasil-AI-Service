@@ -3,6 +3,7 @@
 using Yggdrasil.Tests.Util;
 using Yggdrasil.Services;
 using Yggdrasil.DTO;
+using Yggdrasil.Util;
 using Yggdrasil.Models;
 using Yggdrasil.Tests.Factories;
 using Yggdrasil.Constants;
@@ -88,6 +89,17 @@ public class ChatServiceTests : DatabaseTestBase{
 
     [Fact]
     public async Task Send_CorrectReturn(){
+        var response = OpenRouterMock();
+        var connection = LLMConnectionFactory.Create(_fixture, SupportedProviders.OpenRouter);
+        var payload = LLMPayloadFactory.Create();
+
+        var result = (await _service.Send(connection, payload));
+
+        Assert.IsType<ServiceResult<LLMResponse>>(result);
+    }
+
+    [Fact]
+    public async Task Send_CorrectData(){
 
         var response = OpenRouterMock();
         
@@ -124,5 +136,43 @@ public class ChatServiceTests : DatabaseTestBase{
 
         Assert.Equal(data.Refusal, result.Refusal);
         Assert.Equal(data.Reasoning, result.Reasoning);
+    }
+
+    [Fact]
+    public async Task Send_UnsupportedProviderThrows(){
+        var data = InitData();
+        var response = OpenRouterMock(data);
+
+        var connection = LLMConnectionFactory.Create(_fixture, (SupportedProviders)99999);
+        var payload = LLMPayloadFactory.Create();
+
+        await Assert.ThrowsAsync<NotSupportedException>(()=> _service.Send(connection, payload));
+    }
+
+    [Fact]
+    public async Task Send_MalformedJsonThrows(){
+        var data = "invalid";
+        _handler.Response = JsonSerializer.Serialize(new {
+            incorrect = "incorrectDataFormat"
+        }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+        var connection = LLMConnectionFactory.Create(_fixture, SupportedProviders.OpenRouter);
+        var payload = LLMPayloadFactory.Create();
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.Send(connection, payload));
+    }
+
+    [Fact]
+    public async Task Send_AuthorizationHeader(){
+        OpenRouterMock();
+        var connection = LLMConnectionFactory.Create(_fixture, SupportedProviders.OpenRouter);
+        var payload = LLMPayloadFactory.Create();
+
+        await _service.Send(connection, payload);
+
+        var auth = _handler.PreviousRequest!.Headers.Authorization!;
+
+        Assert.Equal("Bearer", auth.Scheme);
+        Assert.Equal(connection.APIKey, auth.Parameter);
     }
 }

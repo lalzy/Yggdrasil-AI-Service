@@ -69,7 +69,7 @@ public class ChatService
             case SupportedProviders.OpenRouter:
                 return ServiceResult<LLMResponse>.Ok(ParseOpenRouter(JsonSerializer.Deserialize<JsonElement>(result)));
             default:
-                return ServiceResult<LLMResponse>.BadRequest("Unsupported Provider");
+                throw new NotSupportedException(ErrorMessages.INVALID_PROVIDER);
         }
     }
 }
