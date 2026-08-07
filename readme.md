@@ -9,7 +9,7 @@ The world is where the RP takes place (can be based on reality, on fiction, what
 A "protagonist" of sort, that the LLM controls. They can be antagonists, companions, or simply background characters of some import or note. Characters can be shared with any number of worlds and is not tied to a specific world.
 
 **Persona:**
-"character" for the user.
+The user "character". How you want the characters/narrator to 'see' or 'understand' what 'you' are.
 
 ### Current State:
 Working towards MVP (Progress can be seen on the public [Trello](https://trello.com/b/1AmBLJMv)) but in essence, the MVP will have these features:

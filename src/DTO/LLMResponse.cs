@@ -18,6 +18,7 @@ public class LLMResponse{
     public required LLMUsage Usage { get; set; }
     public required string Response { get; set; }
     public required string Role { get; set; }
-    public string? FinishReason { get; set; }
-    public string? RefusalReason { get; set; }
+    public required string FinishReason { get; set; }
+    public string? Refusal { get; set; }
+    public string? Reasoning {get;set;}
 }

@@ -38,7 +38,9 @@ public class ChatService
             },
             Response = message.GetProperty("content").GetString() ?? "",
             Role = message.GetProperty("role").GetString() ?? "",
-            FinishReason = choice.GetProperty("finish_reason").GetString() ,
+            Refusal = message.GetProperty("refusal").GetString(),
+            Reasoning = message.GetProperty("reasoning").GetString(),
+            FinishReason = choice.GetProperty("finish_reason").GetString(),
         };
 
         
